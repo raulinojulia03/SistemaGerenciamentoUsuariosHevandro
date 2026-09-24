@@ -1,0 +1,145 @@
+﻿<Window x:Class="WpfApp1.TelaPrincipal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sistema de Gerenciamento"
+        Height="600"
+        Width="1000"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+
+    <Grid>
+
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0"
+                                 EndPoint="1,1">
+
+                <GradientStop Color="#DCEFF0"
+                              Offset="0"/>
+
+                <GradientStop Color="#F5F8F9"
+                              Offset="1"/>
+
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- MENU LATERAL -->
+        <Border Width="230"
+                HorizontalAlignment="Left"
+                Background="White">
+
+            <StackPanel>
+
+                <TextBlock Text="GERENCIAMENTO"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Foreground="#3C848A"
+                           Margin="25,30,0,5"/>
+
+                <TextBlock Text="Usuários"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="#263238"
+                           Margin="25,0,0,30"/>
+
+                <Button Content="Usuários"
+                        Height="45"
+                        Margin="20,0,20,10"
+                        Background="#3C848A"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Click="Usuarios_Click"/>
+
+                <Button x:Name="btnAuditoria"
+                        Content="Auditoria"
+                        Height="45"
+                        Margin="20,0,20,10"
+                        Background="White"
+                        Foreground="#3C848A"
+                        BorderBrush="#3C848A"
+                        Click="Auditoria_Click"/>
+
+                <Button Content="Meu perfil"
+                        Height="45"
+                        Margin="20,0,20,10"
+                        Background="White"
+                        Foreground="#3C848A"
+                        BorderBrush="#3C848A"
+                        Click="MeuPerfil_Click"/>
+
+                <Button Content="Sair"
+                        Height="45"
+                        Margin="20,300,20,0"
+                        Background="#C75C5C"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Click="Sair_Click"/>
+
+            </StackPanel>
+
+        </Border>
+
+        <!-- CONTEÚDO -->
+        <Grid Margin="230,0,0,0">
+
+            <Border Background="White"
+                    CornerRadius="15"
+                    Margin="30">
+
+                <Grid>
+
+                    <TextBlock Text="Bem-vindo!"
+                               FontSize="30"
+                               FontWeight="Bold"
+                               Foreground="#263238"
+                               Margin="35,35,0,0"/>
+
+                    <TextBlock x:Name="txtNome"
+                               FontSize="20"
+                               Foreground="#3C848A"
+                               Margin="35,85,0,0"/>
+
+                    <TextBlock x:Name="txtUsuario"
+                               FontSize="15"
+                               Foreground="#718096"
+                               Margin="35,120,0,0"/>
+
+                    <!-- AVATAR -->
+                    <Border Width="140"
+                            Height="140"
+                            HorizontalAlignment="Right"
+                            Margin="0,40,60,0"
+                            CornerRadius="70"
+                            Background="#DCEFF0">
+
+                        <Image x:Name="imgAvatar"
+                               Stretch="UniformToFill"/>
+
+                    </Border>
+
+                    <TextBlock Text="Tipo de usuário"
+                               Margin="35,190,0,0"
+                               FontWeight="Bold"/>
+
+                    <TextBlock x:Name="txtTipo"
+                               Margin="35,215,0,0"
+                               Foreground="#3C848A"
+                               FontSize="16"/>
+
+                    <TextBlock Text="Último login"
+                               Margin="35,270,0,0"
+                               FontWeight="Bold"/>
+
+                    <TextBlock x:Name="txtUltimoLogin"
+                               Margin="35,295,0,0"
+                               Foreground="#718096"
+                               FontSize="15"/>
+
+                </Grid>
+
+            </Border>
+
+        </Grid>
+
+    </Grid>
+
+</Window>
