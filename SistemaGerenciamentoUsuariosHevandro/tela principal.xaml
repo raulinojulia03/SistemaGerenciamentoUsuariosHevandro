@@ -61,8 +61,8 @@
                 <Button Content="Meu perfil"
                         Height="45"
                         Margin="20,0,20,10"
-                        Background="White"
-                        Foreground="#3C848A"
+                        Background="#3C848A"
+                        Foreground="White"
                         BorderBrush="#3C848A"
                         Click="MeuPerfil_Click"/>
 
@@ -91,7 +91,7 @@
                                FontSize="30"
                                FontWeight="Bold"
                                Foreground="#263238"
-                               Margin="35,35,0,0"/>
+                               Margin="35,35,495,444"/>
 
                     <TextBlock x:Name="txtNome"
                                FontSize="20"
@@ -101,36 +101,31 @@
                     <TextBlock x:Name="txtUsuario"
                                FontSize="15"
                                Foreground="#718096"
-                               Margin="35,120,0,0"/>
+                               Margin="35,120,195,349"/>
 
                     <!-- AVATAR -->
                     <Border Width="140"
                             Height="140"
                             HorizontalAlignment="Right"
-                            Margin="0,40,60,0"
+                            Margin="0,35,34,349"
                             CornerRadius="70"
-                            Background="#DCEFF0">
-
-                        <Image x:Name="imgAvatar"
-                               Stretch="UniformToFill"/>
-
-                    </Border>
+                            Background="#DCEFF0"/>
 
                     <TextBlock Text="Tipo de usuário"
-                               Margin="35,190,0,0"
+                               Margin="35,190,585,309"
                                FontWeight="Bold"/>
 
                     <TextBlock x:Name="txtTipo"
-                               Margin="35,215,0,0"
+                               Margin="35,215,229,262"
                                Foreground="#3C848A"
                                FontSize="16"/>
 
                     <TextBlock Text="Último login"
-                               Margin="35,270,0,0"
+                               Margin="35,270,601,234"
                                FontWeight="Bold"/>
 
                     <TextBlock x:Name="txtUltimoLogin"
-                               Margin="35,295,0,0"
+                               Margin="35,295,34,24"
                                Foreground="#718096"
                                FontSize="15"/>
 

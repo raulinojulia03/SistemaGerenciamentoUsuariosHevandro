@@ -23,11 +23,11 @@
                    FontSize="30"
                    FontWeight="Bold"
                    Foreground="#263238"
-                   Margin="30,25,0,0"/>
+                   Margin="30,25,830,521"/>
 
         <TextBlock Text="Registro das operações realizadas no sistema."
                    Foreground="#718096"
-                   Margin="32,68,0,0"/>
+                   Margin="32,68,721,499"/>
 
         <Border Background="White"
                 CornerRadius="12"

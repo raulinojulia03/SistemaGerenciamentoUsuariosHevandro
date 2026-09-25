@@ -51,17 +51,23 @@ namespace WpfApp1
                         WHERE usuario = @usuario";
 
                     using (MySqlCommand comando =
-                        new MySqlCommand(query, conexao))
+                           new MySqlCommand(query, conexao))
                     {
                         comando.Parameters.AddWithValue(
-                            "@usuario", usuario);
+                            "@usuario",
+                            usuario);
 
                         using (MySqlDataReader reader =
-                            comando.ExecuteReader())
+                               comando.ExecuteReader())
                         {
+                            // USUÁRIO NÃO ENCONTRADO
                             if (!reader.Read())
                             {
-                                RegistrarLogin(usuario, "LOGIN_INVALIDO");
+                                reader.Close();
+
+                                RegistrarLogin(
+                                    usuario,
+                                    "LOGIN_INVALIDO");
 
                                 MessageBox.Show(
                                     "Usuário ou senha inválidos.",
@@ -72,30 +78,48 @@ namespace WpfApp1
                                 return;
                             }
 
-                            int id = Convert.ToInt32(reader["id"]);
+                            // DADOS DO USUÁRIO
+                            int id =
+                                Convert.ToInt32(reader["id"]);
 
-                            string nome = reader["nome_completo"].ToString();
-                            string usuarioBanco = reader["usuario"].ToString();
-                            string email = reader["email"].ToString();
-                            string senhaBanco = reader["senha"].ToString();
-                            string tipo = reader["tipo_usuario"].ToString();
-                            string status = reader["status"].ToString();
-                            string avatar = reader["avatar"].ToString();
+                            string nome =
+                                reader["nome_completo"].ToString();
+
+                            string usuarioBanco =
+                                reader["usuario"].ToString();
+
+                            string email =
+                                reader["email"].ToString();
+
+                            string senhaBanco =
+                                reader["senha"].ToString();
+
+                            string tipo =
+                                reader["tipo_usuario"].ToString();
+
+                            string status =
+                                reader["status"].ToString();
+
+                            string avatar =
+                                reader["avatar"].ToString();
 
                             int tentativas =
-                                Convert.ToInt32(reader["tentativas_login"]);
+                                Convert.ToInt32(
+                                    reader["tentativas_login"]);
 
                             DateTime? bloqueadoAte = null;
 
                             if (reader["bloqueado_ate"] != DBNull.Value)
                             {
                                 bloqueadoAte =
-                                    Convert.ToDateTime(reader["bloqueado_ate"]);
+                                    Convert.ToDateTime(
+                                        reader["bloqueado_ate"]);
                             }
 
                             reader.Close();
 
-                            // Verifica status
+                            // VERIFICA SE A CONTA ESTÁ ATIVA
+
                             if (status != "Ativo")
                             {
                                 MessageBox.Show(
@@ -107,13 +131,19 @@ namespace WpfApp1
                                 return;
                             }
 
-                            // Verifica bloqueio
+                            // VERIFICA BLOQUEIO TEMPORÁRIO
+
                             if (bloqueadoAte != null &&
                                 bloqueadoAte > DateTime.Now)
                             {
+                                TimeSpan restante =
+                                    bloqueadoAte.Value - DateTime.Now;
+
                                 MessageBox.Show(
                                     "Este usuário está temporariamente bloqueado.\n\n" +
-                                    "Tente novamente mais tarde.",
+                                    "Tente novamente em aproximadamente " +
+                                    Math.Ceiling(restante.TotalMinutes) +
+                                    " minuto(s).",
                                     "Acesso bloqueado",
                                     MessageBoxButton.OK,
                                     MessageBoxImage.Warning);
@@ -121,10 +151,14 @@ namespace WpfApp1
                                 return;
                             }
 
-                            // Verifica senha
-                            if (!BCrypt.Net.BCrypt.Verify(
+                            // VERIFICA SENHA
+
+                            bool senhaCorreta =
+                                BCrypt.Net.BCrypt.Verify(
                                     senha,
-                                    senhaBanco))
+                                    senhaBanco);
+
+                            if (!senhaCorreta)
                             {
                                 RegistrarTentativaInvalida(
                                     id,
@@ -135,21 +169,61 @@ namespace WpfApp1
                             }
 
                             // LOGIN CORRETO
+ 
                             AtualizarLogin(id);
 
+                            // PREENCHER SESSÃO
+
                             Sessao.Id = id;
-                            Sessao.NomeCompleto = nome;
-                            Sessao.Usuario = usuarioBanco;
-                            Sessao.Email = email;
-                            Sessao.TipoUsuario = tipo;
-                            Sessao.Status = status;
-                            Sessao.Avatar = avatar;
+
+                            Sessao.NomeCompleto =
+                                nome;
+
+                            Sessao.Usuario =
+                                usuarioBanco;
+
+                            Sessao.Email =
+                                email;
+
+                            Sessao.TipoUsuario =
+                                tipo;
+
+                            Sessao.Status =
+                                status;
+
+                            Sessao.Avatar =
+                                avatar;
+
+                            // O banco atual não possui uma
+                            // coluna "perfil".
+                            // Portanto usamos o tipo de usuário.
+                            Sessao.Perfil =
+                                tipo;
+
+                            // Administrador é definido pelo
+                            // tipo_usuario do banco.
+                            Sessao.EhAdministrador =
+                                tipo == "Administrador";
+
+                            // Compatibilidade com códigos
+                            // que usam IsADM.
+                            Sessao.IsADM =
+                                tipo == "Administrador";
+
+                            // =====================================
+                            // REGISTRA LOGIN
+                            // =====================================
 
                             RegistrarLogin(
                                 usuarioBanco,
                                 "LOGIN_SUCESSO");
 
-                            TelaPrincipal tela = new TelaPrincipal();
+                            // =====================================
+                            // ABRE TELA PRINCIPAL
+                            // =====================================
+
+                            TelaPrincipal tela =
+                                new TelaPrincipal();
 
                             tela.Show();
 
@@ -161,7 +235,7 @@ namespace WpfApp1
             catch (MySqlException ex)
             {
                 MessageBox.Show(
-                    "Erro ao acessar o banco de dados:\n" +
+                    "Erro ao acessar o banco de dados:\n\n" +
                     ex.Message,
                     "Erro MySQL",
                     MessageBoxButton.OK,
@@ -170,43 +244,54 @@ namespace WpfApp1
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Ocorreu um erro:\n" + ex.Message,
+                    "Ocorreu um erro:\n\n" +
+                    ex.Message,
                     "Erro",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
         }
 
+        // =========================================================
+        // REGISTRA TENTATIVA DE LOGIN INVÁLIDA
+        // =========================================================
+
         private void RegistrarTentativaInvalida(
             int id,
             string usuario,
             int tentativasAtuais)
         {
-            int novasTentativas = tentativasAtuais + 1;
+            int novasTentativas =
+                tentativasAtuais + 1;
 
             try
             {
-                using (MySqlConnection conexao = Banco.CriarConexao())
+                using (MySqlConnection conexao =
+                       Banco.CriarConexao())
                 {
                     conexao.Open();
 
                     DateTime? bloqueadoAte = null;
 
-                    // 5 tentativas = bloqueio por 5 minutos
+                    // 5 tentativas inválidas
+                    // = bloqueio por 5 minutos
                     if (novasTentativas >= 5)
                     {
-                        bloqueadoAte = DateTime.Now.AddMinutes(5);
+                        bloqueadoAte =
+                            DateTime.Now.AddMinutes(5);
+
                         novasTentativas = 0;
                     }
 
                     string query = @"
                         UPDATE usuarios
-                        SET tentativas_login = @tentativas,
+                        SET
+                            tentativas_login = @tentativas,
                             bloqueado_ate = @bloqueado
                         WHERE id = @id";
 
                     using (MySqlCommand comando =
-                        new MySqlCommand(query, conexao))
+                           new MySqlCommand(query, conexao))
                     {
                         comando.Parameters.AddWithValue(
                             "@tentativas",
@@ -223,6 +308,7 @@ namespace WpfApp1
                         comando.ExecuteNonQuery();
                     }
 
+                    // Registra tentativa inválida
                     RegistrarLogin(
                         usuario,
                         "LOGIN_INVALIDO");
@@ -235,15 +321,21 @@ namespace WpfApp1
 
                         MessageBox.Show(
                             "Foram realizadas várias tentativas inválidas.\n\n" +
-                            "O usuário foi bloqueado temporariamente por 5 minutos.",
+                            "O usuário foi bloqueado temporariamente " +
+                            "por 5 minutos.",
                             "Conta bloqueada",
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning);
                     }
                     else
                     {
+                        int restantes =
+                            5 - novasTentativas;
+
                         MessageBox.Show(
-                            "Usuário ou senha inválidos.",
+                            "Usuário ou senha inválidos.\n\n" +
+                            "Tentativas restantes: " +
+                            restantes,
                             "Erro de login",
                             MessageBoxButton.OK,
                             MessageBoxImage.Error);
@@ -253,33 +345,48 @@ namespace WpfApp1
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Erro ao registrar tentativa:\n" +
-                    ex.Message);
+                    "Erro ao registrar tentativa:\n\n" +
+                    ex.Message,
+                    "Erro",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
+        // =========================================================
+        // ATUALIZA ÚLTIMO LOGIN
+        // =========================================================
+
         private void AtualizarLogin(int id)
         {
-            using (MySqlConnection conexao = Banco.CriarConexao())
+            using (MySqlConnection conexao =
+                   Banco.CriarConexao())
             {
                 conexao.Open();
 
                 string query = @"
                     UPDATE usuarios
-                    SET ultimo_login = NOW(),
+                    SET
+                        ultimo_login = NOW(),
                         tentativas_login = 0,
                         bloqueado_ate = NULL
                     WHERE id = @id";
 
                 using (MySqlCommand comando =
-                    new MySqlCommand(query, conexao))
+                       new MySqlCommand(query, conexao))
                 {
-                    comando.Parameters.AddWithValue("@id", id);
+                    comando.Parameters.AddWithValue(
+                        "@id",
+                        id);
 
                     comando.ExecuteNonQuery();
                 }
             }
         }
+
+        // =========================================================
+        // REGISTRA LOG DE AUTENTICAÇÃO
+        // =========================================================
 
         private void RegistrarLogin(
             string usuario,
@@ -287,30 +394,44 @@ namespace WpfApp1
         {
             try
             {
-                using (MySqlConnection conexao = Banco.CriarConexao())
+                using (MySqlConnection conexao =
+                       Banco.CriarConexao())
                 {
                     conexao.Open();
 
                     string query = @"
                         INSERT INTO log_autenticacao
-                        (usuario, evento, resultado)
+                        (
+                            usuario,
+                            evento,
+                            resultado
+                        )
                         VALUES
-                        (@usuario, @evento, @resultado)";
+                        (
+                            @usuario,
+                            @evento,
+                            @resultado
+                        )";
 
                     using (MySqlCommand comando =
-                        new MySqlCommand(query, conexao))
+                           new MySqlCommand(query, conexao))
                     {
                         comando.Parameters.AddWithValue(
-                            "@usuario", usuario);
+                            "@usuario",
+                            usuario);
 
                         comando.Parameters.AddWithValue(
-                            "@evento", evento);
+                            "@evento",
+                            evento);
+
+                        string resultado =
+                            evento == "LOGIN_SUCESSO"
+                                ? "SUCESSO"
+                                : "FALHA";
 
                         comando.Parameters.AddWithValue(
                             "@resultado",
-                            evento == "LOGIN_SUCESSO"
-                                ? "SUCESSO"
-                                : "FALHA");
+                            resultado);
 
                         comando.ExecuteNonQuery();
                     }
@@ -318,21 +439,26 @@ namespace WpfApp1
             }
             catch
             {
-                // Não interrompe o login por erro no log.
+                // Se o log falhar, não impede
+                // o funcionamento do login.
             }
         }
+
+        // =========================================================
+        // BOTÃO CADASTRE-SE
+        // =========================================================
 
         private void Cadastro_Click_1(
             object sender,
             RoutedEventArgs e)
         {
-            // Cadastro de usuários será exclusivo
-            // para administradores.
             MessageBox.Show(
                 "O cadastro de novos usuários deve ser realizado por um administrador.",
                 "Acesso restrito",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
+
+
     }
 }

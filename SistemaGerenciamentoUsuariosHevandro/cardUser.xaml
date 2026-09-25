@@ -25,8 +25,8 @@
                     HorizontalAlignment="Center"
                     Background="#DCEFF0">
 
-                <Image x:Name="imgAvatar"
-                       Stretch="UniformToFill"/>
+                <Image Source ="https://cdn-icons-png.flaticon.com/128/1040/1040005.png" x:Name="imgAvatar"
+                       Stretch="UniformToFill" Margin="5,0,5,10"/>
 
             </Border>
 

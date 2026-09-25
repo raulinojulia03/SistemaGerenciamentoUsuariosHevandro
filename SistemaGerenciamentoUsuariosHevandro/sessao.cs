@@ -20,18 +20,30 @@
 
         public static bool EhAdministrador { get; set; }
 
-        // Compatibilidade com códigos que usam IsADM
+        // Compatibilidade com códigos antigos
         public static bool IsADM
         {
-            get => EhAdministrador;
-            set => EhAdministrador = value;
+            get
+            {
+                return EhAdministrador;
+            }
+            set
+            {
+                EhAdministrador = value;
+            }
         }
 
-        // Compatibilidade caso algum código use IdUsuario
+        // Compatibilidade com códigos que usam IdUsuario
         public static int IdUsuario
         {
-            get => Id;
-            set => Id = value;
+            get
+            {
+                return Id;
+            }
+            set
+            {
+                Id = value;
+            }
         }
 
         public static void Limpar()

@@ -33,51 +33,51 @@
                            FontSize="13"
                            FontWeight="Bold"
                            Foreground="#3C848A"
-                           Margin="40,25,0,0"/>
+                           Margin="40,25,501,477"/>
 
                 <TextBlock Text="Dados do usuário"
                            FontSize="26"
                            FontWeight="Bold"
                            Foreground="#263238"
-                           Margin="40,48,0,0"/>
+                           Margin="40,48,385,436"/>
 
                 <TextBlock Text="Nome completo"
-                           Margin="40,105,0,0"/>
+                           Margin="40,105,520,396"/>
 
                 <TextBox x:Name="txtNome"
                          Width="280"
                          Height="38"
-                         Margin="40,127,0,0"
+                         Margin="40,129,0,353"
                          HorizontalAlignment="Left"
-                         Padding="10"/>
+                         Padding="10" />
 
                 <TextBlock Text="Usuário"
-                           Margin="40,180,0,0"/>
+                           Margin="40,180,565,321"/>
 
                 <TextBox x:Name="txtUsuario"
                          Width="280"
                          Height="38"
-                         Margin="40,202,0,0"
+                         Margin="40,204,0,278"
                          HorizontalAlignment="Left"
                          Padding="10"/>
 
                 <TextBlock Text="E-mail"
-                           Margin="40,255,0,0"/>
+                           Margin="40,255,571,248"/>
 
                 <TextBox x:Name="txtEmail"
                          Width="280"
                          Height="38"
-                         Margin="40,277,0,0"
+                         Margin="40,277,0,205"
                          HorizontalAlignment="Left"
                          Padding="10"/>
 
                 <TextBlock Text="Tipo"
-                           Margin="350,105,0,0"/>
+                           Margin="350,105,265,396"/>
 
                 <ComboBox x:Name="cmbTipo"
                           Width="240"
                           Height="38"
-                          Margin="350,127,0,0"
+                          Margin="350,129,0,353"
                           HorizontalAlignment="Left">
 
                     <ComboBoxItem Content="Usuario"/>
@@ -86,12 +86,12 @@
                 </ComboBox>
 
                 <TextBlock Text="Status"
-                           Margin="350,180,0,0"/>
+                           Margin="350,180,265,321"/>
 
                 <ComboBox x:Name="cmbStatus"
                           Width="240"
                           Height="38"
-                          Margin="350,202,0,0"
+                          Margin="350,204,0,278"
                           HorizontalAlignment="Left">
 
                     <ComboBoxItem Content="Ativo"/>
@@ -100,12 +100,12 @@
                 </ComboBox>
 
                 <TextBlock Text="Avatar"
-                           Margin="350,255,0,0"/>
+                           Margin="350,255,265,248"/>
 
                 <ComboBox x:Name="cmbAvatar"
                           Width="240"
                           Height="38"
-                          Margin="350,277,0,0"
+                          Margin="350,277,0,205"
                           HorizontalAlignment="Left">
 
                     <ComboBoxItem Content="avatar01.png"/>
@@ -119,7 +119,7 @@
                 <Button Content="Salvar"
                         Width="180"
                         Height="42"
-                        Margin="40,410,0,0"
+                        Margin="140,444,0,34"
                         HorizontalAlignment="Left"
                         Background="#3C848A"
                         Foreground="White"
@@ -129,7 +129,7 @@
                 <Button Content="Cancelar"
                         Width="180"
                         Height="42"
-                        Margin="230,410,0,0"
+                        Margin="350,444,0,34"
                         HorizontalAlignment="Left"
                         Background="White"
                         Foreground="#3C848A"

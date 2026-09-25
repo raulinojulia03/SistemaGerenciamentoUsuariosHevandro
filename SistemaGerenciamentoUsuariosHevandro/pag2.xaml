@@ -35,75 +35,75 @@
                            FontSize="13"
                            FontWeight="Bold"
                            Foreground="#3C848A"
-                           Margin="35,25,0,0"/>
+                           Margin="35,25,696,532"/>
 
                 <TextBlock Text="Cadastro"
                            FontSize="28"
                            FontWeight="Bold"
                            Foreground="#263238"
-                           Margin="35,48,0,0"/>
+                           Margin="35,48,685,496"/>
 
                 <!-- COLUNA ESQUERDA -->
 
                 <TextBlock Text="Nome completo"
-                           Margin="35,105,0,0"/>
+                           Margin="35,105,725,459"/>
 
                 <TextBox x:Name="txtNome"
                          Width="330"
                          Height="38"
-                         Margin="35,127,0,0"
+                         Margin="35,126,0,416"
                          HorizontalAlignment="Left"
                          Padding="10"/>
 
                 <TextBlock Text="Usuário"
-                           Margin="35,180,0,0"/>
+                           Margin="35,180,770,378"/>
 
                 <TextBox x:Name="txtUsuario"
                          Width="330"
                          Height="38"
-                         Margin="35,202,0,0"
+                         Margin="35,202,0,340"
                          HorizontalAlignment="Left"
                          Padding="10"/>
 
                 <TextBlock Text="E-mail"
-                           Margin="35,255,0,0"/>
+                           Margin="35,255,770,304"/>
 
                 <TextBox x:Name="txtEmail"
                          Width="330"
                          Height="38"
-                         Margin="35,277,0,0"
+                         Margin="35,278,0,264"
                          HorizontalAlignment="Left"
                          Padding="10"/>
 
                 <TextBlock Text="Senha"
-                           Margin="35,342,0,-12"/>
+                           Margin="35,327,755,234"/>
 
                 <PasswordBox x:Name="txtSenha"
                              Width="330"
                              Height="38"
-                             Margin="35,352,0,0"
+                             Margin="35,353,0,189"
                              HorizontalAlignment="Left"
                              Padding="10"/>
 
                 <TextBlock Text="Confirmar senha"
-                           Margin="35,417,0,-12"/>
+                           Margin="35,417,725,138"/>
 
                 <PasswordBox x:Name="txtConfirmarSenha"
                              Width="330"
                              Height="38"
-                             Margin="35,427,0,0"
+                             Margin="35,442,0,100"
                              HorizontalAlignment="Left"
-                             Padding="10"/>
+                             Padding="10" RenderTransformOrigin="0.489,-0.439"/>
 
                 <!-- COLUNA DIREITA -->
 
                 <TextBlock Text="Tipo de usuário"
-                           Margin="430,105,0,0"/>
+                           Margin="430,105,326,459"/>
 
                 <ComboBox x:Name="cmbTipo"
                           Width="330"
                           Height="38"
-                          Margin="430,127,0,0"
+                          Margin="430,126,0,416"
                           HorizontalAlignment="Left">
 
                     <ComboBoxItem Content="Usuario"/>
@@ -112,12 +112,12 @@
                 </ComboBox>
 
                 <TextBlock Text="Status"
-                           Margin="430,180,0,0"/>
+                           Margin="430,180,373,378"/>
 
                 <ComboBox x:Name="cmbStatus"
                           Width="330"
                           Height="38"
-                          Margin="430,202,0,0"
+                          Margin="430,202,0,340"
                           HorizontalAlignment="Left">
 
                     <ComboBoxItem Content="Ativo"/>
@@ -126,12 +126,12 @@
                 </ComboBox>
 
                 <TextBlock Text="Avatar"
-                           Margin="430,255,0,0"/>
+                           Margin="430,255,343,304"/>
 
                 <ComboBox x:Name="cmbAvatar"
                           Width="330"
                           Height="38"
-                          Margin="430,277,0,0"
+                          Margin="430,281,0,261"
                           HorizontalAlignment="Left">
 
                     <ComboBoxItem Content="avatar01.png"/>
@@ -141,11 +141,6 @@
                     <ComboBoxItem Content="avatar05.png"/>
 
                 </ComboBox>
-
-                <TextBlock Text="Os avatares são fornecidos pelo sistema."
-                           Margin="425,301,5,24"
-                           Foreground="#718096"
-                           FontSize="12"/>
 
                 <!-- BOTÕES -->
 

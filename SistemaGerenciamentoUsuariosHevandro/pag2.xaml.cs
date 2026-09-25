@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using BCryptNet = BCrypt.Net.BCrypt;
 
 namespace WpfApp1
@@ -23,41 +24,13 @@ namespace WpfApp1
         // =========================================================
         // BOTÃO CADASTRAR
         // =========================================================
-        private void Cadastrar_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void Cadastrar_Click(object sender, RoutedEventArgs e)
         {
             string nome = txtNome.Text.Trim();
             string usuario = txtUsuario.Text.Trim();
             string email = txtEmail.Text.Trim();
-            string senha = txtSenha.Password.Trim();
-            string confirmarSenha = txtConfirmarSenha.Password.Trim();
-
-            string tipoUsuario = "Usuario";
-            string status = "Ativo";
-            string avatar = "avatar01.png";
-
-            // Tipo selecionado
-            if (cmbTipo.SelectedItem is System.Windows.Controls.ComboBoxItem tipo)
-            {
-                tipoUsuario = tipo.Content.ToString();
-            }
-
-            // Status selecionado
-            if (cmbStatus.SelectedItem is System.Windows.Controls.ComboBoxItem statusItem)
-            {
-                status = statusItem.Content.ToString();
-            }
-
-            // Avatar selecionado
-            if (cmbAvatar.SelectedItem is System.Windows.Controls.ComboBoxItem avatarItem)
-            {
-                avatar = avatarItem.Content.ToString();
-            }
-
-            // =====================================================
-            // VALIDAÇÕES
-            // =====================================================
+            string senha = txtSenha.Password;
+            string confirmarSenha = txtConfirmarSenha.Password;
 
             if (string.IsNullOrWhiteSpace(nome) ||
                 string.IsNullOrWhiteSpace(usuario) ||
@@ -74,22 +47,11 @@ namespace WpfApp1
                 return;
             }
 
-            if (!email.Contains("@"))
+            if (senha != confirmarSenha)
             {
                 MessageBox.Show(
-                    "Digite um e-mail válido.",
-                    "E-mail inválido",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                return;
-            }
-
-            if (usuario.Length < 3)
-            {
-                MessageBox.Show(
-                    "O usuário deve ter no mínimo 3 caracteres.",
-                    "Usuário inválido",
+                    "As senhas não coincidem.",
+                    "Atenção",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
@@ -99,19 +61,41 @@ namespace WpfApp1
             if (senha.Length < 8)
             {
                 MessageBox.Show(
-                    "A senha deve ter no mínimo 8 caracteres.",
-                    "Senha inválida",
+                    "A senha deve possuir pelo menos 8 caracteres.",
+                    "Atenção",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
                 return;
             }
 
-            if (senha != confirmarSenha)
+            if (cmbTipo.SelectedItem == null)
             {
                 MessageBox.Show(
-                    "As senhas não coincidem.",
-                    "Senha inválida",
+                    "Selecione o tipo de usuário.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (cmbStatus.SelectedItem == null)
+            {
+                MessageBox.Show(
+                    "Selecione o status.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (cmbAvatar.SelectedItem == null)
+            {
+                MessageBox.Show(
+                    "Selecione um avatar.",
+                    "Atenção",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
@@ -125,33 +109,32 @@ namespace WpfApp1
                 {
                     conexao.Open();
 
-                    // =================================================
-                    // VERIFICA SE O USUÁRIO JÁ EXISTE
-                    // =================================================
-
-                    string verificarUsuario = @"
-                        SELECT COUNT(*)
-                        FROM usuarios
-                        WHERE usuario = @usuario";
+                    string verificar = @"
+                SELECT COUNT(*)
+                FROM usuarios
+                WHERE usuario = @usuario
+                   OR email = @email";
 
                     using (MySqlCommand comandoVerificar =
-                        new MySqlCommand(
-                            verificarUsuario,
-                            conexao))
+                        new MySqlCommand(verificar, conexao))
                     {
                         comandoVerificar.Parameters.AddWithValue(
                             "@usuario",
                             usuario);
 
-                        long quantidade =
-                            Convert.ToInt64(
+                        comandoVerificar.Parameters.AddWithValue(
+                            "@email",
+                            email);
+
+                        int quantidade =
+                            Convert.ToInt32(
                                 comandoVerificar.ExecuteScalar());
 
                         if (quantidade > 0)
                         {
                             MessageBox.Show(
-                                "Esse usuário já está cadastrado.",
-                                "Usuário existente",
+                                "O usuário ou e-mail já está cadastrado.",
+                                "Cadastro existente",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Warning);
 
@@ -159,50 +142,50 @@ namespace WpfApp1
                         }
                     }
 
-                    // =================================================
-                    // CRIPTOGRAFA A SENHA
-                    // =================================================
-
                     string senhaCriptografada =
                         BCryptNet.HashPassword(senha);
 
-                    // =================================================
-                    // CADASTRA NO BANCO
-                    // =================================================
-                    //
-                    // Sua tabela atual possui:
-                    // id
-                    // email
-                    // usuario
-                    // senha
-                    // isADM
-                    //
-                    // Como o XAML atual não possui checkbox de
-                    // administrador, o novo usuário será criado
-                    // como usuário comum (isADM = 0).
-                    //
+                    string tipoUsuario =
+                        ((ComboBoxItem)cmbTipo.SelectedItem)
+                        .Content.ToString();
+
+                    string status =
+                        ((ComboBoxItem)cmbStatus.SelectedItem)
+                        .Content.ToString();
+
+                    string avatar =
+                        ((ComboBoxItem)cmbAvatar.SelectedItem)
+                        .Content.ToString();
 
                     string query = @"
-                        INSERT INTO usuarios
-                        (
-                            email,
-                            usuario,
-                            senha,
-                            isADM
-                        )
-                        VALUES
-                        (
-                            @email,
-                            @usuario,
-                            @senha,
-                            @isADM
-                        )";
+                INSERT INTO usuarios
+                (
+                    nome_completo,
+                    email,
+                    usuario,
+                    senha,
+                    tipo_usuario,
+                    status,
+                    avatar
+                )
+                VALUES
+                (
+                    @nome_completo,
+                    @email,
+                    @usuario,
+                    @senha,
+                    @tipo_usuario,
+                    @status,
+                    @avatar
+                )";
 
                     using (MySqlCommand comando =
-                        new MySqlCommand(
-                            query,
-                            conexao))
+                        new MySqlCommand(query, conexao))
                     {
+                        comando.Parameters.AddWithValue(
+                            "@nome_completo",
+                            nome);
+
                         comando.Parameters.AddWithValue(
                             "@email",
                             email);
@@ -216,8 +199,16 @@ namespace WpfApp1
                             senhaCriptografada);
 
                         comando.Parameters.AddWithValue(
-                            "@isADM",
-                            0);
+                            "@tipo_usuario",
+                            tipoUsuario);
+
+                        comando.Parameters.AddWithValue(
+                            "@status",
+                            status);
+
+                        comando.Parameters.AddWithValue(
+                            "@avatar",
+                            avatar);
 
                         comando.ExecuteNonQuery();
                     }
@@ -229,9 +220,7 @@ namespace WpfApp1
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
 
-                // Volta para o login
                 MainWindow login = new MainWindow();
-
                 login.Show();
 
                 Close();
@@ -255,7 +244,6 @@ namespace WpfApp1
                     MessageBoxImage.Error);
             }
         }
-
         // =========================================================
         // BOTÃO CANCELAR
         // =========================================================

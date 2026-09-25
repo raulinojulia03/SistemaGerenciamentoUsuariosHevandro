@@ -28,12 +28,12 @@
                    FontSize="30"
                    FontWeight="Bold"
                    Foreground="#263238"
-                   Margin="30,25,0,0"/>
+                   Margin="30,25,942,571"/>
 
         <TextBlock Text="Gerenciamento de usuários cadastrados"
                    FontSize="14"
                    Foreground="#718096"
-                   Margin="32,68,0,0"/>
+                   Margin="32,68,818,544"/>
 
         <!-- PESQUISA -->
 

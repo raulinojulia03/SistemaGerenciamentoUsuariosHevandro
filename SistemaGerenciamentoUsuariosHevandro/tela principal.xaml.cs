@@ -29,15 +29,16 @@ namespace WpfApp1
 
             try
             {
-                imgAvatar.Source =
-                    new BitmapImage(
-                        new Uri(
-                            "Avatares/" + Sessao.Avatar,
-                            UriKind.Relative));
+                BitmapImage avatar = new BitmapImage();
+                avatar.BeginInit();
+                avatar.UriSource = new Uri("Avatares/" + Sessao.Avatar, UriKind.Relative);
+                avatar.EndInit();
+       
             }
             catch
             {
-                imgAvatar.Source = null;
+                BitmapImage avatar = new BitmapImage();
+                avatar.Source = null;
             }
 
             // Usuário comum não acessa auditoria
@@ -51,7 +52,7 @@ namespace WpfApp1
             object sender,
             RoutedEventArgs e)
         {
-            TelaUsuarios tela = new TelaUsuarios();
+                TelaUsuarios tela = new TelaUsuarios();
 
             tela.Show();
 
