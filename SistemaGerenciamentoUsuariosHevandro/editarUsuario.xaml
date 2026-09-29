@@ -119,7 +119,7 @@
                 <Button Content="Salvar"
                         Width="180"
                         Height="42"
-                        Margin="140,444,0,34"
+                        Margin="69,444,0,34"
                         HorizontalAlignment="Left"
                         Background="#3C848A"
                         Foreground="White"
@@ -129,12 +129,23 @@
                 <Button Content="Cancelar"
                         Width="180"
                         Height="42"
-                        Margin="350,444,0,34"
+                        Margin="269,444,0,34"
                         HorizontalAlignment="Left"
                         Background="White"
                         Foreground="#3C848A"
                         BorderBrush="#3C848A"
                         Click="Cancelar_Click"/>
+
+                <Button Content="Voltar"
+                Width="120"
+                Height="40"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,58,35"
+                Background="White"
+                Foreground="#3C848A"
+                BorderBrush="#3C848A"
+                Click="Voltar_Click"/>
 
             </Grid>
 

@@ -28,17 +28,17 @@
                    FontSize="30"
                    FontWeight="Bold"
                    Foreground="#263238"
-                   Margin="30,25,942,571"/>
+                   Margin="30,10,918,566"/>
 
         <TextBlock Text="Gerenciamento de usuários cadastrados"
                    FontSize="14"
                    Foreground="#718096"
-                   Margin="32,68,818,544"/>
+                   Margin="32,68,805,534"/>
 
         <!-- PESQUISA -->
 
         <TextBox x:Name="txtPesquisa"
-                 Width="280"
+                 Width="861"
                  Height="38"
                  HorizontalAlignment="Left"
                  Margin="30,105,0,0"

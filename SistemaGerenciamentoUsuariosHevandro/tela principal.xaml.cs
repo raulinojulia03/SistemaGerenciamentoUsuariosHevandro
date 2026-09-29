@@ -30,15 +30,22 @@ namespace WpfApp1
             try
             {
                 BitmapImage avatar = new BitmapImage();
+
                 avatar.BeginInit();
-                avatar.UriSource = new Uri("Avatares/" + Sessao.Avatar, UriKind.Relative);
+
+                avatar.UriSource = new Uri(
+                    "Avatares/" + Sessao.Avatar,
+                    UriKind.Relative);
+
                 avatar.EndInit();
-       
+
+                // Coloca a imagem dentro do Image do XAML
+                imgAvatar.Source = avatar;
             }
             catch
             {
-                BitmapImage avatar = new BitmapImage();
-                avatar.Source = null;
+                // Se a imagem não for encontrada
+                imgAvatar.Source = null;
             }
 
             // Usuário comum não acessa auditoria

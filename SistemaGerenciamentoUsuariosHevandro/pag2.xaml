@@ -83,7 +83,7 @@
                              Height="38"
                              Margin="35,353,0,189"
                              HorizontalAlignment="Left"
-                             Padding="10"/>
+                             Padding="10,10"/>
 
                 <TextBlock Text="Confirmar senha"
                            Margin="35,417,725,138"/>

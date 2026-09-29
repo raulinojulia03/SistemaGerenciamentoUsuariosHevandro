@@ -11,26 +11,106 @@ namespace WpfApp1
         private readonly string connectionString =
             "Server=localhost;Database=login;Uid=root;Pwd=;";
 
+        private bool administradorCadastrando;
+
         public CadastroUsuario()
+            : this(false)
+        {
+        }
+
+        public CadastroUsuario(bool administrador)
         {
             InitializeComponent();
 
-            // Valores iniciais dos campos
+            administradorCadastrando = administrador;
+
             cmbTipo.SelectedIndex = 0;
             cmbStatus.SelectedIndex = 0;
             cmbAvatar.SelectedIndex = 0;
+
+            VerificarPrimeiroCadastro();
         }
 
-        // =========================================================
-        // BOTÃO CADASTRAR
-        // =========================================================
-        private void Cadastrar_Click(object sender, RoutedEventArgs e)
+        private void VerificarPrimeiroCadastro()
         {
-            string nome = txtNome.Text.Trim();
-            string usuario = txtUsuario.Text.Trim();
-            string email = txtEmail.Text.Trim();
-            string senha = txtSenha.Password;
-            string confirmarSenha = txtConfirmarSenha.Password;
+            try
+            {
+                using (MySqlConnection conexao =
+                    new MySqlConnection(connectionString))
+                {
+                    conexao.Open();
+
+                    string query =
+                        "SELECT COUNT(*) FROM usuarios";
+
+                    using (MySqlCommand comando =
+                        new MySqlCommand(query, conexao))
+                    {
+                        int quantidade =
+                            Convert.ToInt32(
+                                comando.ExecuteScalar());
+
+                        // PRIMEIRO USUÁRIO
+                        if (quantidade == 0)
+                        {
+                            cmbTipo.SelectedIndex = 1;
+                            cmbTipo.IsEnabled = false;
+
+                            MessageBox.Show(
+                                "Este é o primeiro cadastro do sistema.\n\n" +
+                                "O primeiro usuário será cadastrado automaticamente " +
+                                "como Administrador.",
+                                "Primeiro cadastro",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            // Se foi aberto por administrador,
+                            // ele pode escolher o tipo.
+                            if (administradorCadastrando)
+                            {
+                                cmbTipo.IsEnabled = true;
+                            }
+                            else
+                            {
+                                // Cadastro comum sempre será Usuario
+                                cmbTipo.SelectedIndex = 0;
+                                cmbTipo.IsEnabled = false;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Erro ao verificar os usuários cadastrados:\n\n" +
+                    ex.Message,
+                    "Erro",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void Cadastrar_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            string nome =
+                txtNome.Text.Trim();
+
+            string usuario =
+                txtUsuario.Text.Trim();
+
+            string email =
+                txtEmail.Text.Trim();
+
+            string senha =
+                txtSenha.Password;
+
+            string confirmarSenha =
+                txtConfirmarSenha.Password;
 
             if (string.IsNullOrWhiteSpace(nome) ||
                 string.IsNullOrWhiteSpace(usuario) ||
@@ -69,17 +149,6 @@ namespace WpfApp1
                 return;
             }
 
-            if (cmbTipo.SelectedItem == null)
-            {
-                MessageBox.Show(
-                    "Selecione o tipo de usuário.",
-                    "Atenção",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                return;
-            }
-
             if (cmbStatus.SelectedItem == null)
             {
                 MessageBox.Show(
@@ -109,11 +178,13 @@ namespace WpfApp1
                 {
                     conexao.Open();
 
+                    // VERIFICA SE USUÁRIO OU E-MAIL JÁ EXISTE
+
                     string verificar = @"
-                SELECT COUNT(*)
-                FROM usuarios
-                WHERE usuario = @usuario
-                   OR email = @email";
+                        SELECT COUNT(*)
+                        FROM usuarios
+                        WHERE usuario = @usuario
+                           OR email = @email";
 
                     using (MySqlCommand comandoVerificar =
                         new MySqlCommand(verificar, conexao))
@@ -142,12 +213,45 @@ namespace WpfApp1
                         }
                     }
 
-                    string senhaCriptografada =
-                        BCryptNet.HashPassword(senha);
+                    // VERIFICA QUANTOS USUÁRIOS JÁ EXISTEM
 
-                    string tipoUsuario =
-                        ((ComboBoxItem)cmbTipo.SelectedItem)
-                        .Content.ToString();
+                    string verificarPrimeiro = @"
+                        SELECT COUNT(*)
+                        FROM usuarios";
+
+                    int totalUsuarios;
+
+                    using (MySqlCommand comandoPrimeiro =
+                        new MySqlCommand(
+                            verificarPrimeiro,
+                            conexao))
+                    {
+                        totalUsuarios =
+                            Convert.ToInt32(
+                                comandoPrimeiro.ExecuteScalar());
+                    }
+
+                    // DEFINE O TIPO DO USUÁRIO
+
+                    string tipoUsuario;
+
+                    if (totalUsuarios == 0)
+                    {
+                        // Primeiro usuário obrigatoriamente é administrador
+                        tipoUsuario = "Administrador";
+                    }
+                    else if (administradorCadastrando)
+                    {
+                        // Administrador pode escolher o tipo
+                        tipoUsuario =
+                            ((ComboBoxItem)cmbTipo.SelectedItem)
+                            .Content.ToString();
+                    }
+                    else
+                    {
+                        // Usuário comum só pode criar usuário comum
+                        tipoUsuario = "Usuario";
+                    }
 
                     string status =
                         ((ComboBoxItem)cmbStatus.SelectedItem)
@@ -157,27 +261,32 @@ namespace WpfApp1
                         ((ComboBoxItem)cmbAvatar.SelectedItem)
                         .Content.ToString();
 
+                    string senhaCriptografada =
+                        BCryptNet.HashPassword(senha);
+
+                    // INSERE USUÁRIO
+
                     string query = @"
-                INSERT INTO usuarios
-                (
-                    nome_completo,
-                    email,
-                    usuario,
-                    senha,
-                    tipo_usuario,
-                    status,
-                    avatar
-                )
-                VALUES
-                (
-                    @nome_completo,
-                    @email,
-                    @usuario,
-                    @senha,
-                    @tipo_usuario,
-                    @status,
-                    @avatar
-                )";
+                        INSERT INTO usuarios
+                        (
+                            nome_completo,
+                            email,
+                            usuario,
+                            senha,
+                            tipo_usuario,
+                            status,
+                            avatar
+                        )
+                        VALUES
+                        (
+                            @nome_completo,
+                            @email,
+                            @usuario,
+                            @senha,
+                            @tipo_usuario,
+                            @status,
+                            @avatar
+                        )";
 
                     using (MySqlCommand comando =
                         new MySqlCommand(query, conexao))
@@ -212,15 +321,30 @@ namespace WpfApp1
 
                         comando.ExecuteNonQuery();
                     }
+
+                    if (tipoUsuario == "Administrador")
+                    {
+                        MessageBox.Show(
+                            "Primeiro usuário cadastrado com sucesso!\n\n" +
+                            "Este usuário foi definido automaticamente " +
+                            "como Administrador.",
+                            "Cadastro concluído",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show(
+                            "Usuário cadastrado com sucesso!",
+                            "Cadastro concluído",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
                 }
 
-                MessageBox.Show(
-                    "Usuário cadastrado com sucesso!",
-                    "Sucesso",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                MainWindow login =
+                    new MainWindow();
 
-                MainWindow login = new MainWindow();
                 login.Show();
 
                 Close();
@@ -244,15 +368,13 @@ namespace WpfApp1
                     MessageBoxImage.Error);
             }
         }
-        // =========================================================
-        // BOTÃO CANCELAR
-        // =========================================================
 
         private void Cancelar_Click(
             object sender,
             RoutedEventArgs e)
         {
-            MainWindow login = new MainWindow();
+            MainWindow login =
+                new MainWindow();
 
             login.Show();
 

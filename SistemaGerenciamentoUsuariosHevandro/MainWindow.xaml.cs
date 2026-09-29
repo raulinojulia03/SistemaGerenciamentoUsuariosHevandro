@@ -194,33 +194,22 @@ namespace WpfApp1
                             Sessao.Avatar =
                                 avatar;
 
-                            // O banco atual não possui uma
-                            // coluna "perfil".
-                            // Portanto usamos o tipo de usuário.
                             Sessao.Perfil =
                                 tipo;
 
-                            // Administrador é definido pelo
-                            // tipo_usuario do banco.
                             Sessao.EhAdministrador =
                                 tipo == "Administrador";
 
-                            // Compatibilidade com códigos
-                            // que usam IsADM.
                             Sessao.IsADM =
                                 tipo == "Administrador";
 
-                            // =====================================
                             // REGISTRA LOGIN
-                            // =====================================
 
                             RegistrarLogin(
                                 usuarioBanco,
                                 "LOGIN_SUCESSO");
 
-                            // =====================================
                             // ABRE TELA PRINCIPAL
-                            // =====================================
 
                             TelaPrincipal tela =
                                 new TelaPrincipal();
@@ -236,7 +225,11 @@ namespace WpfApp1
             {
                 MessageBox.Show(
                     "Erro ao acessar o banco de dados:\n\n" +
-                    ex.Message,
+                    ex.Message +
+                    "\n\nDetalhes:\n" +
+                    (ex.InnerException != null
+                        ? ex.InnerException.Message
+                        : "Nenhum detalhe adicional."),
                     "Erro MySQL",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -360,7 +353,7 @@ namespace WpfApp1
         private void AtualizarLogin(int id)
         {
             using (MySqlConnection conexao =
-                   Banco.CriarConexao())
+                Banco.CriarConexao())
             {
                 conexao.Open();
 
@@ -452,11 +445,64 @@ namespace WpfApp1
             object sender,
             RoutedEventArgs e)
         {
-            MessageBox.Show(
-                "O cadastro de novos usuários deve ser realizado por um administrador.",
-                "Acesso restrito",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            try
+            {
+                using (MySqlConnection conexao =
+                       Banco.CriarConexao())
+                {
+                    conexao.Open();
+
+                    string query =
+                        "SELECT COUNT(*) FROM usuarios";
+
+                    using (MySqlCommand comando =
+                           new MySqlCommand(query, conexao))
+                    {
+                        int quantidadeUsuarios =
+                            Convert.ToInt32(
+                                comando.ExecuteScalar());
+
+                        if (quantidadeUsuarios == 0)
+                        {
+                            CadastroUsuario cadastro =
+                                new CadastroUsuario();
+
+                            cadastro.Show();
+
+                            this.Close();
+
+                            return;
+                        }
+                    }
+                }
+
+                if (!Sessao.EhAdministrador)
+                {
+                    MessageBox.Show(
+                        "O cadastro de novos usuários deve ser realizado por um administrador.",
+                        "Acesso restrito",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+
+                    return;
+                }
+
+                CadastroUsuario telaCadastro =
+                    new CadastroUsuario(true);
+
+                telaCadastro.Show();
+
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Erro ao verificar usuários:\n\n" +
+                    ex.Message,
+                    "Erro",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
 

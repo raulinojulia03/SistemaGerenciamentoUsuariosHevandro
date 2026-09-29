@@ -278,5 +278,18 @@ namespace WpfApp1
             Close();
         }
 
+        private void Voltar_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            TelaPrincipal tela =
+                new TelaPrincipal();
+
+            tela.Show();
+
+            Close();
+        }
+
+
     }
 }

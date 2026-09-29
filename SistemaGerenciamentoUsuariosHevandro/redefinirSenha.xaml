@@ -42,21 +42,21 @@
 
                 <PasswordBox x:Name="txtSenha"
                              Width="202"
-                             Margin="35,169,0,126"
-                             Padding="10"
+                             Margin="35,162,0,125"
+                             Padding="10,10"
                              HorizontalAlignment="Left"/>
 
                 <TextBlock Text="Confirmar senha"
-                           Margin="35,137,269,165"/>
+                           Margin="35,195,269,107"/>
 
                 <PasswordBox x:Name="txtConfirmar"
                              Width="202"
-                             Margin="35,213,0,82"
-                             Padding="10"
+                             Margin="35,213,0,75"
+                             Padding="10,10"
                              HorizontalAlignment="Left"/>
 
                 <Button Content="Salvar"
-                        Width="80"
+                        Width="71"
                         Margin="35,289,0,10"
                         HorizontalAlignment="Left"
                         Background="#3C848A"
@@ -67,6 +67,8 @@
             </Grid>
 
         </Border>
+        <TextBlock
+            Margin="86,185,318,201"><Run Language="pt-br" Text="Senha"/></TextBlock>
 
     </Grid>
 
