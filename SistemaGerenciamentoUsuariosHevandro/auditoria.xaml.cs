@@ -24,16 +24,16 @@ namespace WpfApp1
                     conexao.Open();
 
                     string query = @"
-                        SELECT
-                            id,
-                            data_hora,
-                            usuario_responsavel,
-                            operacao,
-                            registro_afetado,
-                            valor_anterior,
-                            novo_valor
-                        FROM auditoria
-                        ORDER BY data_hora DESC";
+                SELECT
+                    id,
+                    data_hora,
+                    usuario_responsavel,
+                    operacao,
+                    registro_afetado,
+                    valor_anterior,
+                    novo_valor
+                FROM auditoria
+                ORDER BY data_hora DESC";
 
                     using (MySqlDataAdapter adapter =
                         new MySqlDataAdapter(
@@ -44,6 +44,26 @@ namespace WpfApp1
                             new DataTable();
 
                         adapter.Fill(tabela);
+
+                        tabela.Columns.Add(
+                            "data_formatada",
+                            typeof(string));
+
+                        foreach (DataRow linha in tabela.Rows)
+                        {
+                            DateTime data =
+                                Convert.ToDateTime(
+                                    linha["data_hora"]);
+
+                            linha["data_formatada"] =
+                                data.ToString(
+                                    "dd/MM/yyyy HH:mm:ss");
+                        }
+
+                        tabela.Columns.Remove("data_hora");
+
+                        tabela.Columns["data_formatada"]
+                            .ColumnName = "data_hora";
 
                         gridAuditoria.ItemsSource =
                             tabela.DefaultView;
@@ -69,5 +89,6 @@ namespace WpfApp1
 
             Close();
         }
+
     }
 }

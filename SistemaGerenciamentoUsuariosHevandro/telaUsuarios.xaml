@@ -28,12 +28,12 @@
                    FontSize="30"
                    FontWeight="Bold"
                    Foreground="#263238"
-                   Margin="30,10,918,566"/>
+                   Margin="30,10,917,559"/>
 
         <TextBlock Text="Gerenciamento de usuários cadastrados"
                    FontSize="14"
                    Foreground="#718096"
-                   Margin="32,68,805,534"/>
+                   Margin="30,80,792,515"/>
 
         <!-- PESQUISA -->
 
@@ -41,7 +41,7 @@
                  Width="861"
                  Height="38"
                  HorizontalAlignment="Left"
-                 Margin="30,105,0,0"
+                 Margin="30,124,0,0"
                  VerticalAlignment="Top"
                  Padding="10"
                  TextChanged="txtPesquisa_TextChanged"/>
@@ -59,7 +59,7 @@
 
         <!-- CARDS -->
 
-        <ScrollViewer Margin="20,160,20,65"
+        <ScrollViewer Margin="30,167,10,58"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
 

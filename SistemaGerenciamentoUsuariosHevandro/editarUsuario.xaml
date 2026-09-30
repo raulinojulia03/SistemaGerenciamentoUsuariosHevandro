@@ -19,7 +19,7 @@
 
             </LinearGradientBrush>
         </Grid.Background>
-
+    
         <Border Width="650"
                 Height="520"
                 Background="White"
@@ -100,19 +100,69 @@
                 </ComboBox>
 
                 <TextBlock Text="Avatar"
-                           Margin="350,255,265,248"/>
+           Margin="350,255,265,248"/>
 
                 <ComboBox x:Name="cmbAvatar"
-                          Width="240"
-                          Height="38"
-                          Margin="350,277,0,205"
-                          HorizontalAlignment="Left">
+          Width="240"
+          Height="38"
+          Margin="350,277,0,205"
+          HorizontalAlignment="Left"
+          SelectedValuePath="Tag">
 
-                    <ComboBoxItem Content="avatar01.png"/>
-                    <ComboBoxItem Content="avatar02.png"/>
-                    <ComboBoxItem Content="avatar03.png"/>
-                    <ComboBoxItem Content="avatar04.png"/>
-                    <ComboBoxItem Content="avatar05.png"/>
+                    <ComboBoxItem Tag="avatar01.png">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="https://cdn-icons-png.flaticon.com/128/80/80886.png"
+                   Width="30"
+                   Height="30"
+                   Margin="0,0,10,0"/>
+                            <TextBlock Text="Avatar 01"
+                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ComboBoxItem>
+
+                    <ComboBoxItem Tag="avatar02.png">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="https://cdn-icons-png.flaticon.com/128/25/25437.png"
+                   Width="30"
+                   Height="30"
+                   Margin="0,0,10,0"/>
+                            <TextBlock Text="Avatar 02"
+                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ComboBoxItem>
+
+                    <ComboBoxItem Tag="avatar03.png">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="https://cdn-icons-png.flaticon.com/128/3891/3891173.png"
+                   Width="30"
+                   Height="30"
+                   Margin="0,0,10,0"/>
+                            <TextBlock Text="Avatar 03"
+                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ComboBoxItem>
+
+                    <ComboBoxItem Tag="avatar04.png">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="https://cdn-icons-png.flaticon.com/128/4886/4886363.png"
+                   Width="30"
+                   Height="30"
+                   Margin="0,0,10,0"/>
+                            <TextBlock Text="Avatar 04"
+                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ComboBoxItem>
+
+                    <ComboBoxItem Tag="avatar05.png">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="https://cdn-icons-png.flaticon.com/128/3991/3991239.png"
+                       Width="30"
+                       Height="30"
+                       Margin="0,0,10,0"/>
+                            <TextBlock Text="Avatar 05"
+                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ComboBoxItem>
 
                 </ComboBox>
 

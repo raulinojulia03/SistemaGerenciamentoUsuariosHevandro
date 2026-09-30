@@ -14,7 +14,7 @@ namespace WpfApp1
         private bool administradorCadastrando;
 
         public CadastroUsuario()
-            : this(false)
+            : this(Sessao.EhAdministrador)
         {
         }
 
@@ -263,8 +263,6 @@ namespace WpfApp1
 
                     string senhaCriptografada =
                         BCryptNet.HashPassword(senha);
-
-                    // INSERE USUÁRIO
 
                     string query = @"
                         INSERT INTO usuarios

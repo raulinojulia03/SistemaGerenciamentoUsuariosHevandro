@@ -67,12 +67,12 @@
                         Click="MeuPerfil_Click"/>
 
                 <Button Content="Sair"
-                        Height="45"
-                        Margin="20,300,20,0"
-                        Background="#C75C5C"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Click="Sair_Click"/>
+        Height="45"
+        Margin="20,160,20,0"
+        Background="#C75C5C"
+        Foreground="White"
+        BorderThickness="0"
+        Click="Sair_Click"/>
 
             </StackPanel>
 
@@ -101,18 +101,21 @@
                     <TextBlock x:Name="txtUsuario"
                                FontSize="15"
                                Foreground="#718096"
-                               Margin="35,120,195,349"/>
+                               Margin="35,120,325,349"/>
 
                     <!-- AVATAR -->
-                    <Border Width="140"
-                     Height="140"
-                     HorizontalAlignment="Right"
-                     Margin="0,35,34,349"
-                     CornerRadius="70"
-                     Background="#DCEFF0">
+                    <Border Width="172"
+                            HorizontalAlignment="Right"
+                            Margin="0,65,69,310"
+                            CornerRadius="70"
+                            Background="#DCEFF0"
+                            ClipToBounds="True">
+
 
                         <Image x:Name="imgAvatar"
-                        Stretch="UniformToFill" OpacityMask="Black" Margin="0,0,-17,-17"/>
+                               Width="90"
+                               Height="90"
+                               Stretch="Uniform"/>
 
                     </Border>
 
@@ -125,9 +128,9 @@
                                Foreground="#3C848A"
                                FontSize="16"/>
 
-                    <TextBlock Text="Último login"
+                    <TextBlock
                                Margin="35,270,601,234"
-                               FontWeight="Bold"/>
+                               FontWeight="Bold"><Run Language="pt-br" Text="Acesso"/></TextBlock>
 
                     <TextBlock x:Name="txtUltimoLogin"
                                Margin="35,295,34,24"

@@ -55,7 +55,10 @@ namespace WpfApp1
                             if (!reader.Read())
                             {
                                 MessageBox.Show(
-                                    "Usuário não encontrado.");
+                                    "Usuário não encontrado.",
+                                    "Atenção",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Warning);
 
                                 Close();
 
@@ -73,36 +76,46 @@ namespace WpfApp1
 
                             SelecionarCombo(
                                 cmbTipo,
-                                reader["tipo_usuario"]
-                                .ToString());
+                                reader["tipo_usuario"].ToString());
 
                             SelecionarCombo(
                                 cmbStatus,
-                                reader["status"]
-                                .ToString());
+                                reader["status"].ToString());
 
                             SelecionarCombo(
                                 cmbAvatar,
-                                reader["avatar"]
-                                .ToString());
+                                reader["avatar"].ToString());
                         }
                     }
                 }
 
-                // Usuário comum só pode editar o próprio perfil
-                if (!Sessao.EhAdministrador)
+                // PERMISSÕES
+
+                if (administradorEditando)
                 {
+                    // Administrador pode alterar
+                    // tipo e status
+                    cmbTipo.IsEnabled = true;
+                    cmbStatus.IsEnabled = true;
+                    txtUsuario.IsEnabled = true;
+                }
+                else
+                {
+                    // Usuário comum só pode alterar
+                    // seus próprios dados básicos
                     cmbTipo.IsEnabled = false;
                     cmbStatus.IsEnabled = false;
-
                     txtUsuario.IsEnabled = false;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Erro ao carregar usuário:\n" +
-                    ex.Message);
+                    "Erro ao carregar usuário:\n\n" +
+                    ex.Message,
+                    "Erro",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
@@ -112,10 +125,25 @@ namespace WpfApp1
         {
             foreach (ComboBoxItem item in combo.Items)
             {
-                if (item.Content.ToString() == valor)
+                // Avatar usa Tag
+                if (combo == cmbAvatar)
                 {
-                    combo.SelectedItem = item;
-                    break;
+                    if (item.Tag != null &&
+                        item.Tag.ToString() == valor)
+                    {
+                        combo.SelectedItem = item;
+                        break;
+                    }
+                }
+                // Tipo e Status usam Content
+                else
+                {
+                    if (item.Content != null &&
+                        item.Content.ToString() == valor)
+                    {
+                        combo.SelectedItem = item;
+                        break;
+                    }
                 }
             }
         }
@@ -143,12 +171,26 @@ namespace WpfApp1
 
             string avatar =
                 ((ComboBoxItem)cmbAvatar.SelectedItem)
-                ?.Content.ToString();
+                ?.Tag?.ToString();
 
             if (string.IsNullOrWhiteSpace(nome))
             {
                 MessageBox.Show(
-                    "O nome é obrigatório.");
+                    "O nome é obrigatório.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(usuario))
+            {
+                MessageBox.Show(
+                    "O usuário é obrigatório.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
 
                 return;
             }
@@ -157,7 +199,43 @@ namespace WpfApp1
                 !email.Contains("@"))
             {
                 MessageBox.Show(
-                    "Informe um e-mail válido.");
+                    "Informe um e-mail válido.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(tipo))
+            {
+                MessageBox.Show(
+                    "Selecione o tipo de usuário.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                MessageBox.Show(
+                    "Selecione o status.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(avatar))
+            {
+                MessageBox.Show(
+                    "Selecione um avatar.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
 
                 return;
             }
@@ -168,6 +246,50 @@ namespace WpfApp1
                     Banco.CriarConexao())
                 {
                     conexao.Open();
+
+                    // VERIFICA USUÁRIO OU E-MAIL DUPLICADO
+
+                    string verificar = @"
+                        SELECT COUNT(*)
+                        FROM usuarios
+                        WHERE (usuario = @usuario
+                        OR email = @email)
+                        AND id <> @id";
+
+                    using (MySqlCommand comandoVerificar =
+                        new MySqlCommand(
+                            verificar,
+                            conexao))
+                    {
+                        comandoVerificar.Parameters.AddWithValue(
+                            "@usuario",
+                            usuario);
+
+                        comandoVerificar.Parameters.AddWithValue(
+                            "@email",
+                            email);
+
+                        comandoVerificar.Parameters.AddWithValue(
+                            "@id",
+                            idUsuario);
+
+                        int quantidade =
+                            Convert.ToInt32(
+                                comandoVerificar.ExecuteScalar());
+
+                        if (quantidade > 0)
+                        {
+                            MessageBox.Show(
+                                "O usuário ou e-mail já está cadastrado para outro usuário.",
+                                "Cadastro existente",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+
+                            return;
+                        }
+                    }
+
+                    // ALTERA USUÁRIO
 
                     string query = @"
                         UPDATE usuarios
@@ -182,33 +304,43 @@ namespace WpfApp1
                         WHERE id = @id";
 
                     using (MySqlCommand comando =
-                        new MySqlCommand(query, conexao))
+                        new MySqlCommand(
+                            query,
+                            conexao))
                     {
                         comando.Parameters.AddWithValue(
-                            "@nome", nome);
+                            "@nome",
+                            nome);
 
                         comando.Parameters.AddWithValue(
-                            "@usuario", usuario);
+                            "@usuario",
+                            usuario);
 
                         comando.Parameters.AddWithValue(
-                            "@email", email);
+                            "@email",
+                            email);
 
                         comando.Parameters.AddWithValue(
-                            "@tipo", tipo);
+                            "@tipo",
+                            tipo);
 
                         comando.Parameters.AddWithValue(
-                            "@status", status);
+                            "@status",
+                            status);
 
                         comando.Parameters.AddWithValue(
-                            "@avatar", avatar);
+                            "@avatar",
+                            avatar);
 
                         comando.Parameters.AddWithValue(
-                            "@id", idUsuario);
+                            "@id",
+                            idUsuario);
 
                         comando.ExecuteNonQuery();
                     }
 
                     // AUDITORIA
+
                     string auditoria = @"
                         INSERT INTO auditoria
                         (
@@ -242,14 +374,18 @@ namespace WpfApp1
 
                         comando.Parameters.AddWithValue(
                             "@novo",
-                            "Dados do usuário alterados");
+                            "Tipo: " + tipo +
+                            " | Status: " + status);
 
                         comando.ExecuteNonQuery();
                     }
                 }
 
                 MessageBox.Show(
-                    "Usuário alterado com sucesso!");
+                    "Usuário alterado com sucesso!",
+                    "Sucesso",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
 
                 TelaUsuarios tela =
                     new TelaUsuarios();
@@ -258,11 +394,23 @@ namespace WpfApp1
 
                 Close();
             }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show(
+                    "Erro ao alterar usuário:\n\n" +
+                    ex.Message,
+                    "Erro MySQL",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Erro ao alterar usuário:\n" +
-                    ex.Message);
+                    "Ocorreu um erro:\n\n" +
+                    ex.Message,
+                    "Erro",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
@@ -289,7 +437,5 @@ namespace WpfApp1
 
             Close();
         }
-
-
     }
 }

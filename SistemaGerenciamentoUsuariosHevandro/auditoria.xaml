@@ -23,18 +23,18 @@
                    FontSize="30"
                    FontWeight="Bold"
                    Foreground="#263238"
-                   Margin="30,10,830,536"/>
+                   Margin="30,10,690,519"/>
 
         <TextBlock Text="Registro das operações realizadas no sistema."
                    Foreground="#718096"
-                   Margin="32,68,721,499"/>
+                   Margin="30,70,690,474"/>
 
-        <Border Background="White"
+        <Border x:Name="gridAuditoria1" Background="White"
                 CornerRadius="12"
-                Margin="30,105,30,70">
+                Margin="30,115,30,60">
 
             <DataGrid x:Name="gridAuditoria"
-                      Margin="10"
+                      Margin="10,10,10,10"
                       AutoGenerateColumns="True"
                       IsReadOnly="True"
                       CanUserAddRows="False"
