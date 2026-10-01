@@ -15,15 +15,10 @@
 
         <!-- FUNDO -->
         <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0"
-                                 EndPoint="1,1">
-                <GradientStop Color="#DCEFF0"
-                              Offset="0"/>
-                <GradientStop Color="#F5F8F9"
-                              Offset="1"/>
-            </LinearGradientBrush>
+            <ImageBrush
+        ImageSource="https://images.unsplash.com/photo-1662560884429-ab43eb250446?w=500&amp;auto=format&amp;fit=crop&amp;q=60&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjY1fHxwYXBlbCUyMGRlJTIwcGFyZWRlJTIwZW0lMjB0ZWxhJTIwY2hlaWF8ZW58MHwwfDB8fHwy"
+        Stretch="UniformToFill"/>
         </Grid.Background>
-
 
         <!-- CARD CENTRAL -->
         <Border Width="390"
@@ -127,7 +122,7 @@
                         Width="300"
                         Height="42"
                         Click="Button_Click"
-                        Background="#3C848A"
+                        Background="#105658"
                         Foreground="White"
                         BorderThickness="0"
                         FontSize="14"
@@ -135,8 +130,8 @@
                         Cursor="Hand"/>
 
 
-                <!-- NÃO TEM CONTA -->
-                <Label
+<!-- NÃO TEM CONTA -->
+<Label
     x:Name="txtNaoTemConta"
     Content="Não tem conta?"
     HorizontalAlignment="Left"

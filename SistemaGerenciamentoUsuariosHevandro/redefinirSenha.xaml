@@ -10,14 +10,9 @@
     <Grid>
 
         <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0"
-                                 EndPoint="1,1">
-
-                <GradientStop Color="#DCEFF0"/>
-                <GradientStop Color="#F5F8F9"
-                              Offset="1"/>
-
-            </LinearGradientBrush>
+            <ImageBrush
+        ImageSource="https://images.unsplash.com/photo-1662560884429-ab43eb250446?w=500&amp;auto=format&amp;fit=crop&amp;q=60&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjY1fHxwYXBlbCUyMGRlJTIwcGFyZWRlJTIwZW0lMjB0ZWxhJTIwY2hlaWF8ZW58MHwwfDB8fHwy"
+        Stretch="UniformToFill"/>
         </Grid.Background>
 
         <Border Width="400"
@@ -32,7 +27,7 @@
                 <TextBlock Text="REDEFINIR SENHA"
                            FontSize="13"
                            FontWeight="Bold"
-                           Foreground="#3C848A"
+                           Foreground="#FF105658"
                            Margin="35,25,245,275"/>
 
                 <TextBlock Text="Nova senha"
@@ -59,7 +54,7 @@
                         Width="71"
                         Margin="35,281,0,10"
                         HorizontalAlignment="Left"
-                        Background="#3C848A"
+                        Background="#FF105658"
                         Foreground="White"
                         BorderThickness="0"
                         Click="Salvar_Click"/>

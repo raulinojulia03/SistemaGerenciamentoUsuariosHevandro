@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -41,19 +42,9 @@ namespace WpfApp1
             txtUltimoLogin.Text =
                 DadosUsuario.UltimoLoginTexto;
 
-            try
-            {
-                imgAvatar.Source =
-                    new BitmapImage(
-                        new Uri(
-                            "Avatares/" +
-                            DadosUsuario.Avatar,
-                            UriKind.Relative));
-            }
-            catch
-            {
-                imgAvatar.Source = null;
-            }
+            // AVATAR
+
+            CarregarAvatar();
 
             // Somente administradores podem
             // editar, redefinir senha ou excluir.
@@ -70,8 +61,127 @@ namespace WpfApp1
             }
         }
 
-        // EDITAR
+        // CARREGAR AVATAR
 
+        private void CarregarAvatar()
+        {
+            try
+            {
+                string avatar =
+                    DadosUsuario.Avatar;
+
+                // Avatar padrão
+                if (string.IsNullOrWhiteSpace(avatar) ||
+                    avatar.Contains("StackPanel"))
+                {
+                    avatar = "avatar01.png";
+                }
+
+                avatar = avatar.Trim();
+
+                // PRIMEIRA TENTATIVA
+                // PASTA DO EXECUTÁVEL
+
+                string caminho =
+                    Path.Combine(
+                        AppDomain.CurrentDomain.BaseDirectory,
+                        "Avatares",
+                        avatar);
+
+                if (File.Exists(caminho))
+                {
+                    MostrarAvatar(caminho);
+                    return;
+                }
+
+                // SEGUNDA TENTATIVA
+                // PASTA DO PROJETO
+ 
+                DirectoryInfo diretorio =
+                    Directory.GetParent(
+                        AppDomain.CurrentDomain.BaseDirectory);
+
+                if (diretorio != null)
+                    diretorio = diretorio.Parent;
+
+                if (diretorio != null)
+                    diretorio = diretorio.Parent;
+
+                if (diretorio != null)
+                {
+                    string caminhoProjeto =
+                        Path.Combine(
+                            diretorio.FullName,
+                            "Avatares",
+                            avatar);
+
+                    if (File.Exists(caminhoProjeto))
+                    {
+                        MostrarAvatar(caminhoProjeto);
+                        return;
+                    }
+                }
+                // TERCEIRA TENTATIVA
+                // DIRETÓRIO ATUAL
+ 
+                string caminhoAtual =
+                    Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "Avatares",
+                        avatar);
+
+                if (File.Exists(caminhoAtual))
+                {
+                    MostrarAvatar(caminhoAtual);
+                    return;
+                }
+
+                // Se não encontrar, não mostra mensagem.
+                imgAvatar.Source = null;
+            }
+            catch
+            {
+                imgAvatar.Source = null;
+            }
+        }
+
+        // MOSTRAR AVATAR
+
+        private void MostrarAvatar(string caminho)
+        {
+            try
+            {
+                BitmapImage imagem =
+                    new BitmapImage();
+
+                imagem.BeginInit();
+
+                imagem.UriSource =
+                    new Uri(
+                        caminho,
+                        UriKind.Absolute);
+
+                imagem.CacheOption =
+                    BitmapCacheOption.OnLoad;
+
+                imagem.CreateOptions =
+                    BitmapCreateOptions.IgnoreImageCache;
+
+                imagem.EndInit();
+
+                imagem.Freeze();
+
+                imgAvatar.Source =
+                    imagem;
+            }
+            catch
+            {
+                imgAvatar.Source = null;
+            }
+        }
+
+        // EDITAR
+ 
         private void Editar_Click(
             object sender,
             RoutedEventArgs e)
@@ -90,7 +200,6 @@ namespace WpfApp1
         }
 
         // EXCLUIR
-
         private void Excluir_Click(
             object sender,
             RoutedEventArgs e)
@@ -178,9 +287,6 @@ namespace WpfApp1
                             }
 
                             // REGISTRO DA AUDITORIA
-                            // Fazemos antes do DELETE porque depois
-                            // o usuário não existirá mais na tabela.
-                            // A SENHA NÃO É REGISTRADA.
 
                             string valorAnterior =
                                 "Nome=" +
@@ -267,8 +373,6 @@ namespace WpfApp1
                                 }
                             }
 
-                            // CONFIRMA AS DUAS OPERAÇÕES
-
                             transacao.Commit();
                         }
                         catch
@@ -288,7 +392,6 @@ namespace WpfApp1
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
 
-                // Volta para a listagem
                 TelaUsuarios tela =
                     new TelaUsuarios();
 

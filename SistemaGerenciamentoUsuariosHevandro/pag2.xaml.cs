@@ -70,7 +70,7 @@ namespace WpfApp1
                                 "Este é o primeiro cadastro do sistema.\n\n" +
                                 "O primeiro usuário será cadastrado " +
                                 "automaticamente como Administrador e Ativo.",
-                                "Primeiro cadastro",
+                                "",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Information);
                         }
@@ -117,6 +117,7 @@ namespace WpfApp1
         }
 
         // CADASTRAR
+
         private void Cadastrar_Click(
             object sender,
             RoutedEventArgs e)
@@ -154,7 +155,7 @@ namespace WpfApp1
             }
 
             // USUÁRIO
- 
+
             if (usuario.Length < 3)
             {
                 MessageBox.Show(
@@ -341,12 +342,21 @@ namespace WpfApp1
                         tipoUsuario = "Usuario";
                     }
 
+
                     // DEFINE AVATAR
 
-                    string avatar =
-                        ((ComboBoxItem)cmbAvatar.SelectedItem)
-                        .Content
-                        .ToString();
+                    // O nome do arquivo está no Tag do ComboBoxItem.
+                    // NÃO usar Content.ToString(), pois o Content
+                    // contém um StackPanel.
+
+                    string avatar = "avatar01.png";
+
+                    if (cmbAvatar.SelectedItem is ComboBoxItem itemAvatar)
+                    {
+                        avatar =
+                            itemAvatar.Tag?.ToString()
+                            ?? "avatar01.png";
+                    }
 
                     // DEFINE STATUS
 
@@ -354,8 +364,7 @@ namespace WpfApp1
 
                     if (primeiroCadastro)
                     {
-                        // O banco também utiliza Ativo como padrão,
-                        // mas definimos aqui para a auditoria.
+                        // O primeiro usuário sempre será Ativo.
                         status = "Ativo";
                     }
                     else
@@ -382,7 +391,7 @@ namespace WpfApp1
 
                             string query;
 
-                            // Primeiro cadastro
+                            // PRIMEIRO CADASTRO
                             if (primeiroCadastro)
                             {
                                 query = @"
@@ -463,6 +472,8 @@ namespace WpfApp1
                                         status);
                                 }
 
+                                // SALVA O NOME CORRETO DO AVATAR
+                                // Exemplo: avatar03.png
                                 comando.Parameters.AddWithValue(
                                     "@avatar",
                                     avatar);
@@ -490,9 +501,6 @@ namespace WpfApp1
                                 avatar;
 
                             // RESPONSÁVEL PELO CADASTRO
-                            // Se for o primeiro cadastro, ainda não existe
-                            // uma sessão autenticada. Nesse caso usamos
-                            // SISTEMA como responsável.
 
                             string responsavel;
 
@@ -590,9 +598,7 @@ namespace WpfApp1
                 }
 
                 // NAVEGAÇÃO APÓS CADASTRO
-
                 // PRIMEIRO USUÁRIO
-                // Vai para a tela de login para fazer o primeiro acesso.
                 if (primeiroCadastro)
                 {
                     MainWindow login =
@@ -604,8 +610,8 @@ namespace WpfApp1
 
                     return;
                 }
-                // ADMINISTRADOR CADASTROU UM NOVO USUÁRIO
 
+                // ADMINISTRADOR CADASTROU UM NOVO USUÁRIO
                 if (administradorCadastrando &&
                     Sessao.EhAdministrador)
                 {
@@ -619,6 +625,7 @@ namespace WpfApp1
                     return;
                 }
 
+                // CADASTRO COMUM
                 MainWindow loginFinal =
                     new MainWindow();
 

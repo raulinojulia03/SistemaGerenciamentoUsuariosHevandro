@@ -9,18 +9,13 @@
 
     <Grid>
 
+        <!-- FUNDO -->
         <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0"
-                                 EndPoint="1,1">
-
-                <GradientStop Color="#DCEFF0"
-                              Offset="0"/>
-
-                <GradientStop Color="#F5F8F9"
-                              Offset="1"/>
-
-            </LinearGradientBrush>
+            <ImageBrush
+                ImageSource="https://images.unsplash.com/photo-1662560884429-ab43eb250446?w=500&amp;auto=format&amp;fit=crop&amp;q=60&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjY1fHxwYXBlbCUyMGRlJTIwcGFyZWRlJTIwZW0lMjB0ZWxhJTIwY2hlaWF8ZW58MHwwfDB8fHwy"
+                Stretch="UniformToFill"/>
         </Grid.Background>
+
 
         <!-- MENU LATERAL -->
         <Border Width="230"
@@ -32,7 +27,7 @@
                 <TextBlock Text="GERENCIAMENTO"
                            FontSize="14"
                            FontWeight="Bold"
-                           Foreground="#3C848A"
+                           Foreground="#FF105658"
                            Margin="25,30,0,5"/>
 
                 <TextBlock Text="Usuários"
@@ -41,13 +36,15 @@
                            Foreground="#263238"
                            Margin="25,0,0,30"/>
 
+
                 <Button Content="Usuários"
                         Height="45"
                         Margin="20,0,20,10"
-                        Background="#3C848A"
+                        Background="#FF105658"
                         Foreground="White"
                         BorderThickness="0"
                         Click="Usuarios_Click"/>
+
 
                 <Button x:Name="btnAuditoria"
                         Content="Auditoria"
@@ -58,84 +55,175 @@
                         BorderBrush="#3C848A"
                         Click="Auditoria_Click"/>
 
+
                 <Button Content="Meu perfil"
                         Height="45"
                         Margin="20,0,20,10"
-                        Background="#3C848A"
+                        Background="#FF105658"
                         Foreground="White"
-                        BorderBrush="#3C848A"
+                        BorderThickness="0"
                         Click="MeuPerfil_Click"/>
 
+
                 <Button Content="Sair"
-        Height="45"
-        Margin="20,160,20,0"
-        Background="#C75C5C"
-        Foreground="White"
-        BorderThickness="0"
-        Click="Sair_Click"/>
+                        Height="45"
+                        Margin="20,160,20,0"
+                        Background="#C75C5C"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Click="Sair_Click"/>
 
             </StackPanel>
 
         </Border>
 
-        <!-- CONTEÚDO -->
+
+        <!-- CONTEÚDO PRINCIPAL -->
+
         <Grid Margin="230,0,0,0">
 
             <Border Background="White"
-                    CornerRadius="15"
+                    CornerRadius="18"
                     Margin="30">
 
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="266*"/>
+                        <ColumnDefinition Width="89*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- TÍTULO -->
 
                     <TextBlock Text="Bem-vindo!"
                                FontSize="30"
                                FontWeight="Bold"
                                Foreground="#263238"
-                               Margin="10,10,518,444"/>
+                               Margin="35,30,0,0"
+                               VerticalAlignment="Top" Grid.ColumnSpan="2"/>
 
-                    <TextBlock x:Name="txtNome"
-                               FontSize="20"
-                               Foreground="#3C848A"
-                               Margin="35,85,0,0"/>
 
-                    <TextBlock x:Name="txtUsuario"
-                               FontSize="15"
+                    <TextBlock Text="Informações da sua conta"
+                               FontSize="14"
                                Foreground="#718096"
-                               Margin="35,120,325,349"/>
-
-                    <!-- AVATAR -->
-                    <Border Width="172"
-                            HorizontalAlignment="Right"
-                            Margin="0,65,69,310"
-                            CornerRadius="70"
-                            Background="#DCEFF0"
-                            ClipToBounds="True">
+                               Margin="37,72,0,0"
+                               VerticalAlignment="Top" Grid.ColumnSpan="2"/>
 
 
-                        <Image x:Name="imgAvatar"
-                               Width="90"
-                               Height="90"
-                               Stretch="Uniform"/>
+                    <!-- ÁREA DO PERFIL -->
+
+                    <Border Background="#F5F8F9"
+                            CornerRadius="15"
+                            Margin="35,115,35,190" Grid.ColumnSpan="2">
+
+                        <Grid>
+
+
+                            <!-- AVATAR -->
+
+                            <Border Width="150"
+                                    Height="150"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Margin="25,0,0,0"
+                                    CornerRadius="60"
+                                    Background="#DCEFF0"
+                                    BorderBrush="#F5F8F9"
+                                    BorderThickness="3"
+                                    ClipToBounds="True">
+
+                                <Grid Width="120"
+                                      Height="120">
+
+                                    <Image x:Name="imgAvatar"
+                                           Width="100"
+                                           Height="100"
+                                           Stretch="UniformToFill"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           SnapsToDevicePixels="True"
+                                           UseLayoutRounding="True"/>
+
+                                </Grid>
+
+                            </Border>
+
+
+                            <!-- NOME -->
+ 
+                            <TextBlock x:Name="txtNome"
+                                       FontSize="25"
+                                       FontWeight="Bold"
+                                       Foreground="#263238"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
+                                       Margin="175,28,20,0"/>
+
+                           <!-- USUÁRIO -->
+ 
+                            <TextBlock x:Name="txtUsuario"
+                                       FontSize="16"
+                                       Foreground="#718096"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
+                                       Margin="175,67,20,0"/>
+
+
+                            <!-- TIPO -->
+ 
+                            <Border Background="#DCEFF0"
+                                    CornerRadius="12"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Margin="175,98,0,0"
+                                    Padding="12,6">
+
+                                <TextBlock x:Name="txtTipo"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="#3C848A"/>
+
+                            </Border>
+
+
+                        </Grid>
 
                     </Border>
 
-                    <TextBlock Text="Tipo de usuário"
-                               Margin="35,190,585,309"
-                               FontWeight="Bold"/>
 
-                    <TextBlock x:Name="txtTipo"
-                               Margin="35,215,229,262"
-                               Foreground="#3C848A"
-                               FontSize="16"/>
+                     <!-- INFORMAÇÕES DE ACESSO -->
+ 
+                    <TextBlock Text="Acesso"
+                               FontSize="17"
+                               FontWeight="Bold"
+                               Foreground="#263238"
+                               Margin="35,365,0,0"
+                               VerticalAlignment="Top" Grid.ColumnSpan="2"/>
 
-                    <TextBlock
-                               Margin="35,270,601,234"
-                               FontWeight="Bold"><Run Language="pt-br" Text="Acesso"/></TextBlock>
 
-                    <TextBlock x:Name="txtUltimoLogin"
-                               Margin="35,295,34,24"
-                               Foreground="#718096"
-                               FontSize="15"/>
+                    <Border Background="#F5F8F9"
+                            CornerRadius="12"
+                            Margin="35,395,35,35" Grid.ColumnSpan="2">
+
+                        <Grid>
+
+                            <TextBlock Text="Último acesso"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       Foreground="#718096"
+                                       Margin="20,15,0,0"
+                                       VerticalAlignment="Top"/>
+
+
+                            <TextBlock x:Name="txtUltimoLogin"
+                                       FontSize="16"
+                                       Foreground="#263238"
+                                       Margin="20,38,20,0"
+                                       VerticalAlignment="Top"/>
+
+                        </Grid>
+
+                    </Border>
+
 
                 </Grid>
 

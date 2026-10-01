@@ -91,7 +91,7 @@
             Width="65"
             Height="30"
             Margin="2"
-            Background="#3C848A"
+            Background="#FF105658"
             Foreground="White"
             BorderThickness="0"
             Click="Editar_Click"/>

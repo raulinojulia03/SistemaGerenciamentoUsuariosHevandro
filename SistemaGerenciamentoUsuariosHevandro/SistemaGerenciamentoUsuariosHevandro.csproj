@@ -204,17 +204,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Avatares\avatar01.png" />
+    <Resource Include="Avatares\avatar02.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Avatares\avatar03.png" />
+    <Resource Include="Avatares\avatar05.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Avatares\avatar04.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Avatares\avatar02.png" />
-    <Resource Include="Avatares\avatar05.png" />
+    <Resource Include="Avatares\avatar03.png" />
+    <Resource Include="Avatares\avatar01.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

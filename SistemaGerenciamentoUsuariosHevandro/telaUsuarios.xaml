@@ -8,39 +8,26 @@
         ResizeMode="NoResize">
 
     <Grid>
-
         <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0"
-                                 EndPoint="1,1">
-
-                <GradientStop Color="#DCEFF0"
-                              Offset="0"/>
-
-                <GradientStop Color="#F5F8F9"
-                              Offset="1"/>
-
-            </LinearGradientBrush>
+            <ImageBrush
+        ImageSource="https://images.unsplash.com/photo-1662560884429-ab43eb250446?w=500&amp;auto=format&amp;fit=crop&amp;q=60&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjY1fHxwYXBlbCUyMGRlJTIwcGFyZWRlJTIwZW0lMjB0ZWxhJTIwY2hlaWF8ZW58MHwwfDB8fHwy"
+        Stretch="UniformToFill"/>
         </Grid.Background>
 
-        <!-- =====================================================
-             CABEÇALHO
-             ===================================================== -->
+        <!--  CABEÇALHO-->
 
         <TextBlock Text="Usuários"
                    FontSize="30"
                    FontWeight="Bold"
-                   Foreground="#263238"
+                   Foreground="Black"
                    Margin="30,10,917,559"/>
 
         <TextBlock Text="Gerenciamento de usuários cadastrados"
                    FontSize="14"
-                   Foreground="#718096"
+                   Foreground="Black"
                    Margin="30,80,792,515"/>
 
-
-        <!-- =====================================================
-             PESQUISA
-             ===================================================== -->
+        <!--  PESQUISA-->
 
         <TextBox x:Name="txtPesquisa"
                  Width="480"
@@ -52,10 +39,7 @@
                  FontSize="13"
                  TextChanged="txtPesquisa_TextChanged"/>
 
-
-        <!-- =====================================================
-             FILTRO DE STATUS
-             ===================================================== -->
+        <!--  FILTRO DE STATUS-->
 
         <ComboBox x:Name="cmbStatusFiltro"
                   Width="170"
@@ -75,10 +59,7 @@
 
         </ComboBox>
 
-
-        <!-- =====================================================
-             FILTRO DE PERFIL
-             ===================================================== -->
+        <!-- FILTRO DE PERFIL -->
 
         <ComboBox x:Name="cmbTipoFiltro"
                   Width="180"
@@ -98,10 +79,7 @@
 
         </ComboBox>
 
-
-        <!-- =====================================================
-             NOVO USUÁRIO
-             ===================================================== -->
+        <!--NOVO USUÁRIO-->
 
         <Button Content="Novo usuário"
                 Width="140"
@@ -114,10 +92,7 @@
                 BorderThickness="0"
                 Click="NovoUsuario_Click"/>
 
-
-        <!-- =====================================================
-             CARDS
-             ===================================================== -->
+        <!-- CARDS -->
 
         <ScrollViewer Margin="30,167,10,58"
                       VerticalScrollBarVisibility="Auto"
@@ -128,10 +103,7 @@
 
         </ScrollViewer>
 
-
-        <!-- =====================================================
-             VOLTAR
-             ===================================================== -->
+        <!--VOLTAR-->
 
         <Button Content="Voltar"
                 Width="120"
@@ -140,8 +112,8 @@
                 VerticalAlignment="Bottom"
                 Margin="0,0,30,15"
                 Background="White"
-                Foreground="#3C848A"
-                BorderBrush="#3C848A"
+                Foreground="#105658"
+                BorderBrush="#105658"
                 Click="Voltar_Click"/>
 
     </Grid>

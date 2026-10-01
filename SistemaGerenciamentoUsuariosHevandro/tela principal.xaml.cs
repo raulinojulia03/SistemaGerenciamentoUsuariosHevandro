@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -15,8 +17,7 @@ namespace WpfApp1
 
         private void CarregarDados()
         {
-            txtNome.Text =
-                Sessao.NomeCompleto;
+            txtNome.Text = Sessao.NomeCompleto;
 
             txtUsuario.Text =
                 "@" + Sessao.Usuario;
@@ -24,8 +25,6 @@ namespace WpfApp1
             txtTipo.Text =
                 Sessao.TipoUsuario;
 
-              // ÚLTIMO LOGIN
-  
             if (string.IsNullOrWhiteSpace(Sessao.UltimoLogin))
             {
                 txtUltimoLogin.Text =
@@ -36,36 +35,136 @@ namespace WpfApp1
                 txtUltimoLogin.Text =
                     Sessao.UltimoLogin;
             }
-            // AVATAR
 
-            try
-            {
-                BitmapImage avatar =
-                    new BitmapImage();
-
-                avatar.BeginInit();
-
-                avatar.UriSource =
-                    new Uri(
-                        "Avatares/" + Sessao.Avatar,
-                        UriKind.Relative);
-
-                avatar.EndInit();
-
-                imgAvatar.Source =
-                    avatar;
-            }
-            catch
-            {
-                imgAvatar.Source = null;
-            }
-            // AUDITORIA
+            CarregarAvatar();
 
             btnAuditoria.Visibility =
                 Sessao.EhAdministrador
                     ? Visibility.Visible
                     : Visibility.Collapsed;
         }
+        // AVATAR
+
+        private void CarregarAvatar()
+        {
+            try
+            {
+                string avatar = Sessao.Avatar;
+
+                // Avatar padrão caso não exista na sessão
+                if (string.IsNullOrWhiteSpace(avatar) ||
+                    avatar.Contains("StackPanel"))
+                {
+                    avatar = "avatar01.png";
+                }
+
+                avatar = avatar.Trim();
+
+                // PASTA DO EXECUTÁVEL
+
+                string pastaAvatares =
+                    Path.Combine(
+                        AppDomain.CurrentDomain.BaseDirectory,
+                        "Avatares");
+
+                string caminho =
+                    Path.Combine(
+                        pastaAvatares,
+                        avatar);
+
+                if (File.Exists(caminho))
+                {
+                    MostrarAvatar(caminho);
+                    return;
+                }
+
+                // PASTA DO PROJETO
+
+                DirectoryInfo diretorio =
+                    Directory.GetParent(
+                        AppDomain.CurrentDomain.BaseDirectory);
+
+                if (diretorio != null)
+                    diretorio = diretorio.Parent;
+
+                if (diretorio != null)
+                    diretorio = diretorio.Parent;
+
+                if (diretorio != null)
+                {
+                    string caminhoProjeto =
+                        Path.Combine(
+                            diretorio.FullName,
+                            "Avatares",
+                            avatar);
+
+                    if (File.Exists(caminhoProjeto))
+                    {
+                        MostrarAvatar(caminhoProjeto);
+                        return;
+                    }
+                }
+
+                // CAMINHO ALTERNATIVO
+
+                string caminhoAtual =
+                    Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "Avatares",
+                        avatar);
+
+                if (File.Exists(caminhoAtual))
+                {
+                    MostrarAvatar(caminhoAtual);
+                    return;
+                }
+
+                // Não mostra mensagem de erro
+                imgAvatar.Source = null;
+            }
+            catch
+            {
+                // Não mostra mensagem de erro
+                imgAvatar.Source = null;
+            }
+        }
+
+        // MOSTRAR AVATAR
+
+        private void MostrarAvatar(string caminho)
+        {
+            try
+            {
+                BitmapImage imagem =
+                    new BitmapImage();
+
+                imagem.BeginInit();
+
+                imagem.UriSource =
+                    new Uri(
+                        caminho,
+                        UriKind.Absolute);
+
+                imagem.CacheOption =
+                    BitmapCacheOption.OnLoad;
+
+                imagem.CreateOptions =
+                    BitmapCreateOptions.IgnoreImageCache;
+
+                imagem.EndInit();
+
+                imagem.Freeze();
+
+                imgAvatar.Source =
+                    imagem;
+            }
+            catch
+            {
+                imgAvatar.Source = null;
+            }
+        }
+
+        // USUÁRIOS
 
         private void Usuarios_Click(
             object sender,
@@ -78,6 +177,8 @@ namespace WpfApp1
 
             Close();
         }
+
+           // AUDITORIA
 
         private void Auditoria_Click(
             object sender,
@@ -94,14 +195,12 @@ namespace WpfApp1
             Close();
         }
 
+        // MEU PERFIL
+ 
         private void MeuPerfil_Click(
             object sender,
             RoutedEventArgs e)
         {
-            // Passa a informação real de administrador.
-            // Isso permite que EditarUsuario saiba
-            // que é o próprio ADM editando a própria conta.
-
             EditarUsuario tela =
                 new EditarUsuario(
                     Sessao.Id,
@@ -111,6 +210,8 @@ namespace WpfApp1
 
             Close();
         }
+
+        // SAIR
 
         private void Sair_Click(
             object sender,
