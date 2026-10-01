@@ -136,29 +136,31 @@
 
 
                 <!-- NÃO TEM CONTA -->
-                <Label Content="Não tem conta?"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"
-                       Margin="100,355,0,0"
-                       FontSize="12"
-                       Foreground="#718096"/>
-
+                <Label
+    x:Name="txtNaoTemConta"
+    Content="Não tem conta?"
+    HorizontalAlignment="Left"
+    VerticalAlignment="Top"
+    Margin="100,355,0,0"
+    FontSize="12"
+    Foreground="#718096"/>
 
                 <!-- CADASTRO -->
                 <Button x:Name="cadastro"
-                        Content="Cadastre-se"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Margin="199,355,0,0"
-                        Width="105"
-                        Height="30"
-                        Click="Cadastro_Click_1"
-                        Background="Transparent"
-                        Foreground="#3C848A"
-                        BorderThickness="0"
-                        FontSize="12"
-                        FontWeight="Bold"
-                        Cursor="Hand" RenderTransformOrigin="0.514,0.867"/>
+        Content="Cadastre-se"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Top"
+        Margin="199,355,0,0"
+        Width="105"
+        Height="30"
+        Click="Cadastro_Click_1"
+        Background="Transparent"
+        Foreground="#3C848A"
+        BorderThickness="0"
+        FontSize="12"
+        FontWeight="Bold"
+        Cursor="Hand"
+        Visibility="Collapsed"/>
 
             </Grid>
 

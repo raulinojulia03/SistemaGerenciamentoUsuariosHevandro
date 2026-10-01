@@ -24,31 +24,43 @@ namespace WpfApp1
             txtTipo.Text =
                 Sessao.TipoUsuario;
 
-            txtUltimoLogin.Text =
-                "Acesso realizado com sucesso.";
+              // ÚLTIMO LOGIN
+  
+            if (string.IsNullOrWhiteSpace(Sessao.UltimoLogin))
+            {
+                txtUltimoLogin.Text =
+                    "Primeiro acesso.";
+            }
+            else
+            {
+                txtUltimoLogin.Text =
+                    Sessao.UltimoLogin;
+            }
+            // AVATAR
 
             try
             {
-                BitmapImage avatar = new BitmapImage();
+                BitmapImage avatar =
+                    new BitmapImage();
 
                 avatar.BeginInit();
 
-                avatar.UriSource = new Uri(
-                    "Avatares/" + Sessao.Avatar,
-                    UriKind.Relative);
+                avatar.UriSource =
+                    new Uri(
+                        "Avatares/" + Sessao.Avatar,
+                        UriKind.Relative);
 
                 avatar.EndInit();
 
-                // Coloca a imagem dentro do Image do XAML
-                imgAvatar.Source = avatar;
+                imgAvatar.Source =
+                    avatar;
             }
             catch
             {
-                // Se a imagem não for encontrada
                 imgAvatar.Source = null;
             }
+            // AUDITORIA
 
-            // Usuário comum não acessa auditoria
             btnAuditoria.Visibility =
                 Sessao.EhAdministrador
                     ? Visibility.Visible
@@ -59,11 +71,12 @@ namespace WpfApp1
             object sender,
             RoutedEventArgs e)
         {
-                TelaUsuarios tela = new TelaUsuarios();
+            TelaUsuarios tela =
+                new TelaUsuarios();
 
             tela.Show();
 
-            this.Close();
+            Close();
         }
 
         private void Auditoria_Click(
@@ -73,23 +86,30 @@ namespace WpfApp1
             if (!Sessao.EhAdministrador)
                 return;
 
-            Auditoria tela = new Auditoria();
+            Auditoria tela =
+                new Auditoria();
 
             tela.Show();
 
-            this.Close();
+            Close();
         }
 
         private void MeuPerfil_Click(
             object sender,
             RoutedEventArgs e)
         {
+            // Passa a informação real de administrador.
+            // Isso permite que EditarUsuario saiba
+            // que é o próprio ADM editando a própria conta.
+
             EditarUsuario tela =
-                new EditarUsuario(Sessao.Id, false);
+                new EditarUsuario(
+                    Sessao.Id,
+                    Sessao.EhAdministrador);
 
             tela.Show();
 
-            this.Close();
+            Close();
         }
 
         private void Sair_Click(
@@ -103,7 +123,7 @@ namespace WpfApp1
 
             login.Show();
 
-            this.Close();
+            Close();
         }
     }
 }

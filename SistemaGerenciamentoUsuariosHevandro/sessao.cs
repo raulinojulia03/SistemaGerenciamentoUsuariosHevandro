@@ -18,6 +18,9 @@
 
         public static string Avatar { get; set; } = "";
 
+        // Guarda o último login anterior ao login atual
+        public static string UltimoLogin { get; set; } = "";
+
         public static bool EhAdministrador { get; set; }
 
         // Compatibilidade com códigos antigos
@@ -56,6 +59,7 @@
             Perfil = "";
             Status = "";
             Avatar = "";
+            UltimoLogin = "";
             EhAdministrador = false;
         }
     }

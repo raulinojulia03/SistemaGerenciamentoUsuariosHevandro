@@ -55,6 +55,8 @@ namespace WpfApp1
                 imgAvatar.Source = null;
             }
 
+            // Somente administradores podem
+            // editar, redefinir senha ou excluir.
             if (!administrador)
             {
                 btnEditar.Visibility =
@@ -67,6 +69,8 @@ namespace WpfApp1
                     Visibility.Collapsed;
             }
         }
+
+        // EDITAR
 
         private void Editar_Click(
             object sender,
@@ -85,10 +89,14 @@ namespace WpfApp1
             janela?.Close();
         }
 
+        // EXCLUIR
+
         private void Excluir_Click(
             object sender,
             RoutedEventArgs e)
         {
+            // NÃO PERMITIR QUE O ADMIN EXCLUA A PRÓPRIA CONTA
+
             if (DadosUsuario.Id == Sessao.Id)
             {
                 MessageBox.Show(
@@ -100,76 +108,187 @@ namespace WpfApp1
                 return;
             }
 
+            // CONFIRMAÇÃO DA EXCLUSÃO
+
             MessageBoxResult resultado =
                 MessageBox.Show(
                     "Deseja realmente excluir o usuário:\n\n" +
-                    DadosUsuario.NomeCompleto + "?",
+                    "Nome: " +
+                    DadosUsuario.NomeCompleto +
+                    "\nUsuário: @" +
+                    DadosUsuario.UsuarioNome +
+                    "\nE-mail: " +
+                    DadosUsuario.Email,
                     "Confirmar exclusão",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
 
             if (resultado != MessageBoxResult.Yes)
+            {
                 return;
+            }
 
             try
             {
-                using (var conexao = Banco.CriarConexao())
+                using (MySqlConnection conexao =
+                    Banco.CriarConexao())
                 {
                     conexao.Open();
 
-                    // Verifica se é o último administrador
-                    if (DadosUsuario.TipoUsuario ==
-                        "Administrador")
-                    {
-                        string verificar =
-                            "SELECT COUNT(*) FROM usuarios " +
-                            "WHERE tipo_usuario = 'Administrador' " +
-                            "AND status = 'Ativo'";
+                    // INICIA TRANSAÇÃO
 
-                        using (var comando =
-                            new MySqlCommand(
-                                verificar,
-                                conexao))
+                    using (MySqlTransaction transacao =
+                        conexao.BeginTransaction())
+                    {
+                        try
                         {
-                            int quantidade =
-                                Convert.ToInt32(
-                                    comando.ExecuteScalar());
+                            // VERIFICA SE O USUÁRIO É ADMINISTRADOR
+                            // E SE É O ÚLTIMO ADMINISTRADOR
 
-                            if (quantidade <= 1)
+                            if (DadosUsuario.TipoUsuario ==
+                                "Administrador")
                             {
-                                MessageBox.Show(
-                                    "Não é possível excluir o último administrador ativo.",
-                                    "Operação não permitida",
-                                    MessageBoxButton.OK,
-                                    MessageBoxImage.Warning);
+                                string verificar =
+                                    @"SELECT COUNT(*)
+                                      FROM usuarios
+                                      WHERE tipo_usuario = 'Administrador'";
 
-                                return;
+                                using (MySqlCommand comando =
+                                    new MySqlCommand(
+                                        verificar,
+                                        conexao,
+                                        transacao))
+                                {
+                                    int quantidade =
+                                        Convert.ToInt32(
+                                            comando.ExecuteScalar());
+
+                                    if (quantidade <= 1)
+                                    {
+                                        MessageBox.Show(
+                                            "Não é possível excluir o último administrador do sistema.",
+                                            "Operação não permitida",
+                                            MessageBoxButton.OK,
+                                            MessageBoxImage.Warning);
+
+                                        transacao.Rollback();
+                                        return;
+                                    }
+                                }
                             }
+
+                            // REGISTRO DA AUDITORIA
+                            // Fazemos antes do DELETE porque depois
+                            // o usuário não existirá mais na tabela.
+                            // A SENHA NÃO É REGISTRADA.
+
+                            string valorAnterior =
+                                "Nome=" +
+                                DadosUsuario.NomeCompleto +
+                                " | Usuário=" +
+                                DadosUsuario.UsuarioNome +
+                                " | E-mail=" +
+                                DadosUsuario.Email +
+                                " | Perfil=" +
+                                DadosUsuario.TipoUsuario +
+                                " | Status=" +
+                                DadosUsuario.Status +
+                                " | Avatar=" +
+                                DadosUsuario.Avatar;
+
+                            string auditoria =
+                                @"INSERT INTO auditoria
+                                (
+                                    data_hora,
+                                    usuario_responsavel,
+                                    operacao,
+                                    registro_afetado,
+                                    valor_anterior,
+                                    novo_valor
+                                )
+                                VALUES
+                                (
+                                    NOW(),
+                                    @responsavel,
+                                    'EXCLUSAO',
+                                    @registro,
+                                    @valorAnterior,
+                                    @novoValor
+                                )";
+
+                            using (MySqlCommand comandoAuditoria =
+                                new MySqlCommand(
+                                    auditoria,
+                                    conexao,
+                                    transacao))
+                            {
+                                comandoAuditoria.Parameters.AddWithValue(
+                                    "@responsavel",
+                                    Sessao.Usuario);
+
+                                comandoAuditoria.Parameters.AddWithValue(
+                                    "@registro",
+                                    DadosUsuario.UsuarioNome);
+
+                                comandoAuditoria.Parameters.AddWithValue(
+                                    "@valorAnterior",
+                                    valorAnterior);
+
+                                comandoAuditoria.Parameters.AddWithValue(
+                                    "@novoValor",
+                                    "—");
+
+                                comandoAuditoria.ExecuteNonQuery();
+                            }
+
+                            // EXCLUI O USUÁRIO
+
+                            string query =
+                                @"DELETE FROM usuarios
+                                  WHERE id = @id";
+
+                            using (MySqlCommand comando =
+                                new MySqlCommand(
+                                    query,
+                                    conexao,
+                                    transacao))
+                            {
+                                comando.Parameters.AddWithValue(
+                                    "@id",
+                                    DadosUsuario.Id);
+
+                                int registrosAfetados =
+                                    comando.ExecuteNonQuery();
+
+                                if (registrosAfetados == 0)
+                                {
+                                    throw new Exception(
+                                        "O usuário não foi encontrado.");
+                                }
+                            }
+
+                            // CONFIRMA AS DUAS OPERAÇÕES
+
+                            transacao.Commit();
                         }
-                    }
-
-                    string query =
-                        "DELETE FROM usuarios WHERE id = @id";
-
-                    using (var comando =
-                        new MySqlCommand(
-                            query,
-                            conexao))
-                    {
-                        comando.Parameters.AddWithValue(
-                            "@id",
-                            DadosUsuario.Id);
-
-                        comando.ExecuteNonQuery();
+                        catch
+                        {
+                            transacao.Rollback();
+                            throw;
+                        }
                     }
                 }
 
+                // SUCESSO
+
                 MessageBox.Show(
-                    "Usuário excluído com sucesso.",
+                    "Usuário excluído com sucesso.\n\n" +
+                    "A exclusão também foi registrada na auditoria.",
                     "Sucesso",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
 
+                // Volta para a listagem
                 TelaUsuarios tela =
                     new TelaUsuarios();
 
@@ -183,7 +302,7 @@ namespace WpfApp1
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Erro ao excluir usuário:\n" +
+                    "Erro ao excluir usuário:\n\n" +
                     ex.Message,
                     "Erro",
                     MessageBoxButton.OK,
@@ -191,12 +310,16 @@ namespace WpfApp1
             }
         }
 
+        // REDEFINIR SENHA
+
         private void Senha_Click(
             object sender,
             RoutedEventArgs e)
         {
             if (!Sessao.EhAdministrador)
+            {
                 return;
+            }
 
             RedefinirSenha tela =
                 new RedefinirSenha(

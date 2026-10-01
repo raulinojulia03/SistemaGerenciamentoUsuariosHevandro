@@ -14,12 +14,13 @@
                                  EndPoint="1,1">
 
                 <GradientStop Color="#DCEFF0"/>
+
                 <GradientStop Color="#F5F8F9"
                               Offset="1"/>
 
             </LinearGradientBrush>
         </Grid.Background>
-    
+
         <Border Width="650"
                 Height="520"
                 Background="White"
@@ -41,6 +42,8 @@
                            Foreground="#263238"
                            Margin="40,48,385,436"/>
 
+                <!-- NOME -->
+
                 <TextBlock Text="Nome completo"
                            Margin="40,105,520,396"/>
 
@@ -49,7 +52,9 @@
                          Height="38"
                          Margin="40,129,0,353"
                          HorizontalAlignment="Left"
-                         Padding="10" />
+                         Padding="10"/>
+
+                <!-- USUÁRIO -->
 
                 <TextBlock Text="Usuário"
                            Margin="40,180,565,321"/>
@@ -61,6 +66,8 @@
                          HorizontalAlignment="Left"
                          Padding="10"/>
 
+                <!-- EMAIL -->
+
                 <TextBlock Text="E-mail"
                            Margin="40,255,571,248"/>
 
@@ -70,6 +77,8 @@
                          Margin="40,277,0,205"
                          HorizontalAlignment="Left"
                          Padding="10"/>
+
+                <!-- TIPO -->
 
                 <TextBlock Text="Tipo"
                            Margin="350,105,265,396"/>
@@ -81,9 +90,12 @@
                           HorizontalAlignment="Left">
 
                     <ComboBoxItem Content="Usuario"/>
+
                     <ComboBoxItem Content="Administrador"/>
 
                 </ComboBox>
+
+                <!-- STATUS -->
 
                 <TextBlock Text="Status"
                            Margin="350,180,265,321"/>
@@ -95,9 +107,12 @@
                           HorizontalAlignment="Left">
 
                     <ComboBoxItem Content="Ativo"/>
+
                     <ComboBoxItem Content="Inativo"/>
 
                 </ComboBox>
+
+                <!-- AVATAR -->
 
                 <TextBlock Text="Avatar"
            Margin="350,255,265,248"/>
@@ -111,91 +126,126 @@
 
                     <ComboBoxItem Tag="avatar01.png">
                         <StackPanel Orientation="Horizontal">
+
                             <Image Source="https://cdn-icons-png.flaticon.com/128/80/80886.png"
                    Width="30"
                    Height="30"
                    Margin="0,0,10,0"/>
+
                             <TextBlock Text="Avatar 01"
                        VerticalAlignment="Center"/>
+
                         </StackPanel>
                     </ComboBoxItem>
 
                     <ComboBoxItem Tag="avatar02.png">
                         <StackPanel Orientation="Horizontal">
+
                             <Image Source="https://cdn-icons-png.flaticon.com/128/25/25437.png"
                    Width="30"
                    Height="30"
                    Margin="0,0,10,0"/>
+
                             <TextBlock Text="Avatar 02"
                        VerticalAlignment="Center"/>
+
                         </StackPanel>
                     </ComboBoxItem>
 
                     <ComboBoxItem Tag="avatar03.png">
                         <StackPanel Orientation="Horizontal">
+
                             <Image Source="https://cdn-icons-png.flaticon.com/128/3891/3891173.png"
                    Width="30"
                    Height="30"
                    Margin="0,0,10,0"/>
+
                             <TextBlock Text="Avatar 03"
                        VerticalAlignment="Center"/>
+
                         </StackPanel>
                     </ComboBoxItem>
 
                     <ComboBoxItem Tag="avatar04.png">
                         <StackPanel Orientation="Horizontal">
+
                             <Image Source="https://cdn-icons-png.flaticon.com/128/4886/4886363.png"
                    Width="30"
                    Height="30"
                    Margin="0,0,10,0"/>
+
                             <TextBlock Text="Avatar 04"
                        VerticalAlignment="Center"/>
+
                         </StackPanel>
                     </ComboBoxItem>
 
                     <ComboBoxItem Tag="avatar05.png">
                         <StackPanel Orientation="Horizontal">
+
                             <Image Source="https://cdn-icons-png.flaticon.com/128/3991/3991239.png"
-                       Width="30"
-                       Height="30"
-                       Margin="0,0,10,0"/>
+                   Width="30"
+                   Height="30"
+                   Margin="0,0,10,0"/>
+
                             <TextBlock Text="Avatar 05"
                        VerticalAlignment="Center"/>
+
                         </StackPanel>
                     </ComboBoxItem>
 
                 </ComboBox>
 
+                <!-- SALVAR -->
+
                 <Button Content="Salvar"
-                        Width="180"
+                        Width="150"
                         Height="42"
-                        Margin="69,444,0,34"
+                        Margin="40,444,0,34"
                         HorizontalAlignment="Left"
                         Background="#3C848A"
                         Foreground="White"
                         BorderThickness="0"
                         Click="Salvar_Click"/>
 
+                <!-- CANCELAR -->
+
                 <Button Content="Cancelar"
-                        Width="180"
+                        Width="150"
                         Height="42"
-                        Margin="269,444,0,34"
+                        Margin="205,444,0,34"
                         HorizontalAlignment="Left"
                         Background="White"
                         Foreground="#3C848A"
                         BorderBrush="#3C848A"
                         Click="Cancelar_Click"/>
 
+                <!-- ALTERAR SENHA -->
+
+                <Button x:Name="btnAlterarSenha"
+                        Content="Alterar senha"
+                        Width="150"
+                        Height="42"
+                        Margin="370,444,0,34"
+                        HorizontalAlignment="Left"
+                        Background="White"
+                        Foreground="#3C848A"
+                        BorderBrush="#3C848A"
+                        Click="AlterarSenha_Click"
+                        Visibility="Collapsed"/>
+
+                <!-- VOLTAR -->
+
                 <Button Content="Voltar"
-                Width="120"
-                Height="40"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Margin="0,0,58,35"
-                Background="White"
-                Foreground="#3C848A"
-                BorderBrush="#3C848A"
-                Click="Voltar_Click"/>
+                        Width="100"
+                        Height="40"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Margin="0,0,40,35"
+                        Background="White"
+                        Foreground="#3C848A"
+                        BorderBrush="#3C848A"
+                        Click="Voltar_Click"/>
 
             </Grid>
 

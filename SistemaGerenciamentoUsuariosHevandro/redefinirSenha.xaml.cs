@@ -19,16 +19,29 @@ namespace WpfApp1
             object sender,
             RoutedEventArgs e)
         {
-            string senha =
-                txtSenha.Password;
+            string senha = txtSenha.Password;
+            string confirmar = txtConfirmar.Password;
 
-            string confirmar =
-                txtConfirmar.Password;
+            // VALIDAÇÃO DA SENHA
+
+            if (string.IsNullOrWhiteSpace(senha))
+            {
+                MessageBox.Show(
+                    "Informe a nova senha.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
 
             if (senha.Length < 8)
             {
                 MessageBox.Show(
-                    "A senha deve possuir no mínimo 8 caracteres.");
+                    "A senha deve possuir no mínimo 8 caracteres.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
 
                 return;
             }
@@ -36,7 +49,10 @@ namespace WpfApp1
             if (senha != confirmar)
             {
                 MessageBox.Show(
-                    "As senhas não coincidem.");
+                    "As senhas não coincidem.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
 
                 return;
             }
@@ -44,17 +60,20 @@ namespace WpfApp1
             try
             {
                 string hash =
-                    BCrypt.Net.BCrypt.HashPassword(
-                        senha);
+                    BCrypt.Net.BCrypt.HashPassword(senha);
 
                 using (MySqlConnection conexao =
                     Banco.CriarConexao())
                 {
                     conexao.Open();
 
+                    // ALTERAR SENHA
+
                     string query = @"
                         UPDATE usuarios
-                        SET senha = @senha
+                        SET
+                            senha = @senha,
+                            data_alteracao = NOW()
                         WHERE id = @id";
 
                     using (MySqlCommand comando =
@@ -68,8 +87,21 @@ namespace WpfApp1
                             "@id",
                             idUsuario);
 
-                        comando.ExecuteNonQuery();
+                        int linhasAfetadas =
+                            comando.ExecuteNonQuery();
+
+                        if (linhasAfetadas == 0)
+                        {
+                            MessageBox.Show(
+                                "Usuário não encontrado.",
+                                "Atenção",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+
+                            return;
+                        }
                     }
+                    // AUDITORIA
 
                     string auditoria = @"
                         INSERT INTO auditoria
@@ -90,9 +122,7 @@ namespace WpfApp1
                         )";
 
                     using (MySqlCommand comando =
-                        new MySqlCommand(
-                            auditoria,
-                            conexao))
+                        new MySqlCommand(auditoria, conexao))
                     {
                         comando.Parameters.AddWithValue(
                             "@responsavel",
@@ -100,22 +130,33 @@ namespace WpfApp1
 
                         comando.Parameters.AddWithValue(
                             "@afetado",
-                            idUsuario);
+                            idUsuario.ToString());
 
                         comando.ExecuteNonQuery();
                     }
                 }
 
                 MessageBox.Show(
-                    "Senha redefinida com sucesso!");
+                    "Senha redefinida com sucesso!",
+                    "Sucesso",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                TelaPrincipal tela =
+                    new TelaPrincipal();
+
+                tela.Show();
 
                 Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Erro ao redefinir senha:\n" +
-                    ex.Message);
+                    "Erro ao redefinir senha:\n\n" +
+                    ex.Message,
+                    "Erro",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
     }

@@ -8,10 +8,8 @@ namespace WpfApp1
 {
     public partial class CadastroUsuario : Window
     {
-        private readonly string connectionString =
-            "Server=localhost;Database=login;Uid=root;Pwd=;";
-
         private bool administradorCadastrando;
+        private bool primeiroCadastro;
 
         public CadastroUsuario()
             : this(Sessao.EhAdministrador)
@@ -24,6 +22,7 @@ namespace WpfApp1
 
             administradorCadastrando = administrador;
 
+            // Valores iniciais
             cmbTipo.SelectedIndex = 0;
             cmbStatus.SelectedIndex = 0;
             cmbAvatar.SelectedIndex = 0;
@@ -31,17 +30,19 @@ namespace WpfApp1
             VerificarPrimeiroCadastro();
         }
 
+        // VERIFICA PRIMEIRO CADASTRO
+
         private void VerificarPrimeiroCadastro()
         {
             try
             {
-                using (MySqlConnection conexao =
-                    new MySqlConnection(connectionString))
+                using (MySqlConnection conexao = Banco.CriarConexao())
                 {
                     conexao.Open();
 
-                    string query =
-                        "SELECT COUNT(*) FROM usuarios";
+                    string query = @"
+                        SELECT COUNT(*)
+                        FROM usuarios";
 
                     using (MySqlCommand comando =
                         new MySqlCommand(query, conexao))
@@ -51,32 +52,54 @@ namespace WpfApp1
                                 comando.ExecuteScalar());
 
                         // PRIMEIRO USUÁRIO
+
                         if (quantidade == 0)
                         {
+                            primeiroCadastro = true;
+
+                            // Primeiro usuário será Administrador
                             cmbTipo.SelectedIndex = 1;
                             cmbTipo.IsEnabled = false;
 
+                            // Primeiro usuário será Ativo.
+                            // Não será necessário escolher o status.
+                            cmbStatus.SelectedIndex = -1;
+                            cmbStatus.IsEnabled = false;
+
                             MessageBox.Show(
                                 "Este é o primeiro cadastro do sistema.\n\n" +
-                                "O primeiro usuário será cadastrado automaticamente " +
-                                "como Administrador.",
+                                "O primeiro usuário será cadastrado " +
+                                "automaticamente como Administrador e Ativo.",
                                 "Primeiro cadastro",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Information);
                         }
                         else
                         {
-                            // Se foi aberto por administrador,
-                            // ele pode escolher o tipo.
+                            primeiroCadastro = false;
+
+                            // ADMINISTRADOR CADASTRANDO
+
                             if (administradorCadastrando)
                             {
                                 cmbTipo.IsEnabled = true;
+                                cmbStatus.IsEnabled = true;
+
+                                cmbTipo.SelectedIndex = 0;
+                                cmbStatus.SelectedIndex = 0;
                             }
+
+                            // OUTRA SITUAÇÃO
+
                             else
                             {
-                                // Cadastro comum sempre será Usuario
+                                // Cadastro comum sempre será Usuário
                                 cmbTipo.SelectedIndex = 0;
                                 cmbTipo.IsEnabled = false;
+
+                                // Usuário comum sempre será Ativo
+                                cmbStatus.SelectedIndex = 0;
+                                cmbStatus.IsEnabled = false;
                             }
                         }
                     }
@@ -93,6 +116,7 @@ namespace WpfApp1
             }
         }
 
+        // CADASTRAR
         private void Cadastrar_Click(
             object sender,
             RoutedEventArgs e)
@@ -112,6 +136,8 @@ namespace WpfApp1
             string confirmarSenha =
                 txtConfirmarSenha.Password;
 
+            // VALIDAÇÕES
+
             if (string.IsNullOrWhiteSpace(nome) ||
                 string.IsNullOrWhiteSpace(usuario) ||
                 string.IsNullOrWhiteSpace(email) ||
@@ -120,6 +146,52 @@ namespace WpfApp1
             {
                 MessageBox.Show(
                     "Preencha todos os campos obrigatórios.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            // USUÁRIO
+ 
+            if (usuario.Length < 3)
+            {
+                MessageBox.Show(
+                    "O usuário deve possuir pelo menos 3 caracteres.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                txtUsuario.Focus();
+                return;
+            }
+
+            // E-MAIL
+
+            if (!email.Contains("@") ||
+                !email.Contains(".") ||
+                email.StartsWith("@") ||
+                email.EndsWith("@") ||
+                email.StartsWith(".") ||
+                email.EndsWith("."))
+            {
+                MessageBox.Show(
+                    "Informe um e-mail válido.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                txtEmail.Focus();
+                return;
+            }
+
+            // SENHA
+
+            if (senha.Length < 8)
+            {
+                MessageBox.Show(
+                    "A senha deve possuir pelo menos 8 caracteres.",
                     "Atenção",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -138,18 +210,10 @@ namespace WpfApp1
                 return;
             }
 
-            if (senha.Length < 8)
-            {
-                MessageBox.Show(
-                    "A senha deve possuir pelo menos 8 caracteres.",
-                    "Atenção",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+            // STATUS
 
-                return;
-            }
-
-            if (cmbStatus.SelectedItem == null)
+            if (!primeiroCadastro &&
+                cmbStatus.SelectedItem == null)
             {
                 MessageBox.Show(
                     "Selecione o status.",
@@ -159,6 +223,8 @@ namespace WpfApp1
 
                 return;
             }
+
+            // AVATAR
 
             if (cmbAvatar.SelectedItem == null)
             {
@@ -174,11 +240,11 @@ namespace WpfApp1
             try
             {
                 using (MySqlConnection conexao =
-                    new MySqlConnection(connectionString))
+                    Banco.CriarConexao())
                 {
                     conexao.Open();
 
-                    // VERIFICA SE USUÁRIO OU E-MAIL JÁ EXISTE
+                    // VERIFICA DUPLICIDADE
 
                     string verificar = @"
                         SELECT COUNT(*)
@@ -187,7 +253,9 @@ namespace WpfApp1
                            OR email = @email";
 
                     using (MySqlCommand comandoVerificar =
-                        new MySqlCommand(verificar, conexao))
+                        new MySqlCommand(
+                            verificar,
+                            conexao))
                     {
                         comandoVerificar.Parameters.AddWithValue(
                             "@usuario",
@@ -213,7 +281,7 @@ namespace WpfApp1
                         }
                     }
 
-                    // VERIFICA QUANTOS USUÁRIOS JÁ EXISTEM
+                    // VERIFICA NOVAMENTE SE É O PRIMEIRO CADASTRO
 
                     string verificarPrimeiro = @"
                         SELECT COUNT(*)
@@ -231,101 +299,281 @@ namespace WpfApp1
                                 comandoPrimeiro.ExecuteScalar());
                     }
 
-                    // DEFINE O TIPO DO USUÁRIO
+                    if (totalUsuarios == 0)
+                    {
+                        primeiroCadastro = true;
+                    }
+                    else
+                    {
+                        primeiroCadastro = false;
+                    }
+
+                    // DEFINE TIPO DO USUÁRIO
 
                     string tipoUsuario;
 
-                    if (totalUsuarios == 0)
+                    if (primeiroCadastro)
                     {
-                        // Primeiro usuário obrigatoriamente é administrador
+                        // Primeiro usuário sempre é Administrador
                         tipoUsuario = "Administrador";
                     }
                     else if (administradorCadastrando)
                     {
-                        // Administrador pode escolher o tipo
+                        if (cmbTipo.SelectedItem == null)
+                        {
+                            MessageBox.Show(
+                                "Selecione o tipo de usuário.",
+                                "Atenção",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+
+                            return;
+                        }
+
                         tipoUsuario =
                             ((ComboBoxItem)cmbTipo.SelectedItem)
-                            .Content.ToString();
+                            .Content
+                            .ToString();
                     }
                     else
                     {
-                        // Usuário comum só pode criar usuário comum
+                        // Cadastro que não é feito pelo administrador
                         tipoUsuario = "Usuario";
                     }
 
-                    string status =
-                        ((ComboBoxItem)cmbStatus.SelectedItem)
-                        .Content.ToString();
+                    // DEFINE AVATAR
 
                     string avatar =
                         ((ComboBoxItem)cmbAvatar.SelectedItem)
-                        .Content.ToString();
+                        .Content
+                        .ToString();
+
+                    // DEFINE STATUS
+
+                    string status;
+
+                    if (primeiroCadastro)
+                    {
+                        // O banco também utiliza Ativo como padrão,
+                        // mas definimos aqui para a auditoria.
+                        status = "Ativo";
+                    }
+                    else
+                    {
+                        status =
+                            ((ComboBoxItem)cmbStatus.SelectedItem)
+                            .Content
+                            .ToString();
+                    }
+
+                    // CRIPTOGRAFA SENHA
 
                     string senhaCriptografada =
                         BCryptNet.HashPassword(senha);
 
-                    string query = @"
-                        INSERT INTO usuarios
-                        (
-                            nome_completo,
-                            email,
-                            usuario,
-                            senha,
-                            tipo_usuario,
-                            status,
-                            avatar
-                        )
-                        VALUES
-                        (
-                            @nome_completo,
-                            @email,
-                            @usuario,
-                            @senha,
-                            @tipo_usuario,
-                            @status,
-                            @avatar
-                        )";
+                    // INICIA TRANSAÇÃO
 
-                    using (MySqlCommand comando =
-                        new MySqlCommand(query, conexao))
+                    using (MySqlTransaction transacao =
+                        conexao.BeginTransaction())
                     {
-                        comando.Parameters.AddWithValue(
-                            "@nome_completo",
-                            nome);
+                        try
+                        {
+                            // CADASTRA USUÁRIO
 
-                        comando.Parameters.AddWithValue(
-                            "@email",
-                            email);
+                            string query;
 
-                        comando.Parameters.AddWithValue(
-                            "@usuario",
-                            usuario);
+                            // Primeiro cadastro
+                            if (primeiroCadastro)
+                            {
+                                query = @"
+                                    INSERT INTO usuarios
+                                    (
+                                        nome_completo,
+                                        email,
+                                        usuario,
+                                        senha,
+                                        tipo_usuario,
+                                        avatar
+                                    )
+                                    VALUES
+                                    (
+                                        @nome_completo,
+                                        @email,
+                                        @usuario,
+                                        @senha,
+                                        @tipo_usuario,
+                                        @avatar
+                                    )";
+                            }
+                            else
+                            {
+                                query = @"
+                                    INSERT INTO usuarios
+                                    (
+                                        nome_completo,
+                                        email,
+                                        usuario,
+                                        senha,
+                                        tipo_usuario,
+                                        status,
+                                        avatar
+                                    )
+                                    VALUES
+                                    (
+                                        @nome_completo,
+                                        @email,
+                                        @usuario,
+                                        @senha,
+                                        @tipo_usuario,
+                                        @status,
+                                        @avatar
+                                    )";
+                            }
 
-                        comando.Parameters.AddWithValue(
-                            "@senha",
-                            senhaCriptografada);
+                            using (MySqlCommand comando =
+                                new MySqlCommand(
+                                    query,
+                                    conexao,
+                                    transacao))
+                            {
+                                comando.Parameters.AddWithValue(
+                                    "@nome_completo",
+                                    nome);
 
-                        comando.Parameters.AddWithValue(
-                            "@tipo_usuario",
-                            tipoUsuario);
+                                comando.Parameters.AddWithValue(
+                                    "@email",
+                                    email);
 
-                        comando.Parameters.AddWithValue(
-                            "@status",
-                            status);
+                                comando.Parameters.AddWithValue(
+                                    "@usuario",
+                                    usuario);
 
-                        comando.Parameters.AddWithValue(
-                            "@avatar",
-                            avatar);
+                                comando.Parameters.AddWithValue(
+                                    "@senha",
+                                    senhaCriptografada);
 
-                        comando.ExecuteNonQuery();
+                                comando.Parameters.AddWithValue(
+                                    "@tipo_usuario",
+                                    tipoUsuario);
+
+                                if (!primeiroCadastro)
+                                {
+                                    comando.Parameters.AddWithValue(
+                                        "@status",
+                                        status);
+                                }
+
+                                comando.Parameters.AddWithValue(
+                                    "@avatar",
+                                    avatar);
+
+                                comando.ExecuteNonQuery();
+                            }
+
+                            // AUDITORIA DO CADASTRO
+
+                            string valorAnterior =
+                                "—";
+
+                            string novoValor =
+                                "Nome=" +
+                                nome +
+                                " | Usuário=" +
+                                usuario +
+                                " | E-mail=" +
+                                email +
+                                " | Perfil=" +
+                                tipoUsuario +
+                                " | Status=" +
+                                status +
+                                " | Avatar=" +
+                                avatar;
+
+                            // RESPONSÁVEL PELO CADASTRO
+                            // Se for o primeiro cadastro, ainda não existe
+                            // uma sessão autenticada. Nesse caso usamos
+                            // SISTEMA como responsável.
+
+                            string responsavel;
+
+                            if (primeiroCadastro ||
+                                string.IsNullOrWhiteSpace(
+                                    Sessao.Usuario))
+                            {
+                                responsavel = "SISTEMA";
+                            }
+                            else
+                            {
+                                responsavel =
+                                    Sessao.Usuario;
+                            }
+
+                            string auditoria = @"
+                                INSERT INTO auditoria
+                                (
+                                    data_hora,
+                                    usuario_responsavel,
+                                    operacao,
+                                    registro_afetado,
+                                    valor_anterior,
+                                    novo_valor
+                                )
+                                VALUES
+                                (
+                                    NOW(),
+                                    @responsavel,
+                                    'CADASTRO',
+                                    @registro,
+                                    @valorAnterior,
+                                    @novoValor
+                                )";
+
+                            using (MySqlCommand comandoAuditoria =
+                                new MySqlCommand(
+                                    auditoria,
+                                    conexao,
+                                    transacao))
+                            {
+                                comandoAuditoria.Parameters.AddWithValue(
+                                    "@responsavel",
+                                    responsavel);
+
+                                comandoAuditoria.Parameters.AddWithValue(
+                                    "@registro",
+                                    usuario);
+
+                                comandoAuditoria.Parameters.AddWithValue(
+                                    "@valorAnterior",
+                                    valorAnterior);
+
+                                comandoAuditoria.Parameters.AddWithValue(
+                                    "@novoValor",
+                                    novoValor);
+
+                                comandoAuditoria.ExecuteNonQuery();
+                            }
+
+                            // CONFIRMA TRANSAÇÃO
+
+                            transacao.Commit();
+                        }
+                        catch
+                        {
+                            transacao.Rollback();
+                            throw;
+                        }
                     }
 
-                    if (tipoUsuario == "Administrador")
+                    // MENSAGEM
+
+                    if (primeiroCadastro)
                     {
                         MessageBox.Show(
                             "Primeiro usuário cadastrado com sucesso!\n\n" +
-                            "Este usuário foi definido automaticamente " +
-                            "como Administrador.",
+                            "O usuário foi definido automaticamente como:\n" +
+                            "Administrador\n" +
+                            "Ativo\n\n" +
+                            "O cadastro também foi registrado na auditoria.",
                             "Cadastro concluído",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
@@ -333,17 +581,48 @@ namespace WpfApp1
                     else
                     {
                         MessageBox.Show(
-                            "Usuário cadastrado com sucesso!",
+                            "Usuário cadastrado com sucesso!\n\n" +
+                            "O cadastro também foi registrado na auditoria.",
                             "Cadastro concluído",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
                     }
                 }
 
-                MainWindow login =
+                // NAVEGAÇÃO APÓS CADASTRO
+
+                // PRIMEIRO USUÁRIO
+                // Vai para a tela de login para fazer o primeiro acesso.
+                if (primeiroCadastro)
+                {
+                    MainWindow login =
+                        new MainWindow();
+
+                    login.Show();
+
+                    Close();
+
+                    return;
+                }
+                // ADMINISTRADOR CADASTROU UM NOVO USUÁRIO
+
+                if (administradorCadastrando &&
+                    Sessao.EhAdministrador)
+                {
+                    TelaPrincipal tela =
+                        new TelaPrincipal();
+
+                    tela.Show();
+
+                    Close();
+
+                    return;
+                }
+
+                MainWindow loginFinal =
                     new MainWindow();
 
-                login.Show();
+                loginFinal.Show();
 
                 Close();
             }
@@ -371,6 +650,23 @@ namespace WpfApp1
             object sender,
             RoutedEventArgs e)
         {
+            // Se o cadastro foi aberto pelo administrador,
+            // volta para a TelaPrincipal.
+            if (administradorCadastrando &&
+                Sessao.EhAdministrador)
+            {
+                TelaPrincipal tela =
+                    new TelaPrincipal();
+
+                tela.Show();
+
+                Close();
+
+                return;
+            }
+
+            // Primeiro cadastro ou cadastro sem administrador
+            // volta para a tela de login.
             MainWindow login =
                 new MainWindow();
 

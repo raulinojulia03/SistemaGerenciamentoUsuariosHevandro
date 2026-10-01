@@ -22,7 +22,9 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <!-- CABEÇALHO -->
+        <!-- =====================================================
+             CABEÇALHO
+             ===================================================== -->
 
         <TextBlock Text="Usuários"
                    FontSize="30"
@@ -35,29 +37,87 @@
                    Foreground="#718096"
                    Margin="30,80,792,515"/>
 
-        <!-- PESQUISA -->
+
+        <!-- =====================================================
+             PESQUISA
+             ===================================================== -->
 
         <TextBox x:Name="txtPesquisa"
-                 Width="861"
+                 Width="480"
                  Height="38"
                  HorizontalAlignment="Left"
                  Margin="30,124,0,0"
                  VerticalAlignment="Top"
                  Padding="10"
+                 FontSize="13"
                  TextChanged="txtPesquisa_TextChanged"/>
+
+
+        <!-- =====================================================
+             FILTRO DE STATUS
+             ===================================================== -->
+
+        <ComboBox x:Name="cmbStatusFiltro"
+                  Width="170"
+                  Height="38"
+                  HorizontalAlignment="Left"
+                  Margin="537,124,0,0"
+                  VerticalAlignment="Top"
+                  FontSize="13"
+                  SelectedIndex="0"
+                  SelectionChanged="Filtro_SelectionChanged">
+
+            <ComboBoxItem Content="Status: Todos"/>
+
+            <ComboBoxItem Content="Status: Ativo"/>
+
+            <ComboBoxItem Content="Status: Inativo"/>
+
+        </ComboBox>
+
+
+        <!-- =====================================================
+             FILTRO DE PERFIL
+             ===================================================== -->
+
+        <ComboBox x:Name="cmbTipoFiltro"
+                  Width="180"
+                  Height="38"
+                  HorizontalAlignment="Left"
+                  Margin="717,124,0,0"
+                  VerticalAlignment="Top"
+                  FontSize="13"
+                  SelectedIndex="0"
+                  SelectionChanged="Filtro_SelectionChanged">
+
+            <ComboBoxItem Content="Perfil: Todos"/>
+
+            <ComboBoxItem Content="Perfil: Usuário"/>
+
+            <ComboBoxItem Content="Perfil: Administrador"/>
+
+        </ComboBox>
+
+
+        <!-- =====================================================
+             NOVO USUÁRIO
+             ===================================================== -->
 
         <Button Content="Novo usuário"
                 Width="140"
                 Height="38"
                 HorizontalAlignment="Right"
-                Margin="0,105,30,0"
+                Margin="0,124,30,0"
                 VerticalAlignment="Top"
                 Background="#3C848A"
                 Foreground="White"
                 BorderThickness="0"
                 Click="NovoUsuario_Click"/>
 
-        <!-- CARDS -->
+
+        <!-- =====================================================
+             CARDS
+             ===================================================== -->
 
         <ScrollViewer Margin="30,167,10,58"
                       VerticalScrollBarVisibility="Auto"
@@ -68,7 +128,10 @@
 
         </ScrollViewer>
 
-        <!-- VOLTAR -->
+
+        <!-- =====================================================
+             VOLTAR
+             ===================================================== -->
 
         <Button Content="Voltar"
                 Width="120"

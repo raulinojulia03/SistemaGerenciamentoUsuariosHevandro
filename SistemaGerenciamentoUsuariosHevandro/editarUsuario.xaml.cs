@@ -9,6 +9,7 @@ namespace WpfApp1
     {
         private int idUsuario;
         private bool administradorEditando;
+        private bool editandoPropriaConta;
 
         public EditarUsuario(
             int id,
@@ -19,8 +20,13 @@ namespace WpfApp1
             idUsuario = id;
             administradorEditando = administrador;
 
+            editandoPropriaConta =
+                idUsuario == Sessao.Id;
+
             CarregarUsuario();
         }
+
+        // CARREGAR USUÁRIO
 
         private void CarregarUsuario()
         {
@@ -61,7 +67,6 @@ namespace WpfApp1
                                     MessageBoxImage.Warning);
 
                                 Close();
-
                                 return;
                             }
 
@@ -91,21 +96,32 @@ namespace WpfApp1
 
                 // PERMISSÕES
 
-                if (administradorEditando)
+                if (editandoPropriaConta)
                 {
-                    // Administrador pode alterar
-                    // tipo e status
-                    cmbTipo.IsEnabled = true;
-                    cmbStatus.IsEnabled = true;
-                    txtUsuario.IsEnabled = true;
-                }
-                else
-                {
-                    // Usuário comum só pode alterar
-                    // seus próprios dados básicos
                     cmbTipo.IsEnabled = false;
                     cmbStatus.IsEnabled = false;
                     txtUsuario.IsEnabled = false;
+
+                    btnAlterarSenha.Visibility =
+                        Visibility.Visible;
+                }
+                else if (administradorEditando)
+                {
+                    cmbTipo.IsEnabled = true;
+                    cmbStatus.IsEnabled = true;
+                    txtUsuario.IsEnabled = true;
+
+                    btnAlterarSenha.Visibility =
+                        Visibility.Visible;
+                }
+                else
+                {
+                    cmbTipo.IsEnabled = false;
+                    cmbStatus.IsEnabled = false;
+                    txtUsuario.IsEnabled = false;
+
+                    btnAlterarSenha.Visibility =
+                        Visibility.Visible;
                 }
             }
             catch (Exception ex)
@@ -119,13 +135,14 @@ namespace WpfApp1
             }
         }
 
+        // SELECIONAR COMBO
+
         private void SelecionarCombo(
             ComboBox combo,
             string valor)
         {
             foreach (ComboBoxItem item in combo.Items)
             {
-                // Avatar usa Tag
                 if (combo == cmbAvatar)
                 {
                     if (item.Tag != null &&
@@ -135,7 +152,6 @@ namespace WpfApp1
                         break;
                     }
                 }
-                // Tipo e Status usam Content
                 else
                 {
                     if (item.Content != null &&
@@ -147,6 +163,8 @@ namespace WpfApp1
                 }
             }
         }
+
+        // SALVAR
 
         private void Salvar_Click(
             object sender,
@@ -173,16 +191,21 @@ namespace WpfApp1
                 ((ComboBoxItem)cmbAvatar.SelectedItem)
                 ?.Tag?.ToString();
 
+            // VALIDAÇÃO DO NOME
+
             if (string.IsNullOrWhiteSpace(nome))
             {
                 MessageBox.Show(
-                    "O nome é obrigatório.",
+                    "O nome completo é obrigatório.",
                     "Atenção",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
+                txtNome.Focus();
                 return;
             }
+
+            // VALIDAÇÃO DO USUÁRIO
 
             if (string.IsNullOrWhiteSpace(usuario))
             {
@@ -192,11 +215,42 @@ namespace WpfApp1
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
+                txtUsuario.Focus();
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(email) ||
-                !email.Contains("@"))
+            if (usuario.Length < 3)
+            {
+                MessageBox.Show(
+                    "O usuário deve possuir pelo menos 3 caracteres.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                txtUsuario.Focus();
+                return;
+            }
+
+            // VALIDAÇÃO DO E-MAIL
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                MessageBox.Show(
+                    "O e-mail é obrigatório.",
+                    "Atenção",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                txtEmail.Focus();
+                return;
+            }
+
+            if (!email.Contains("@") ||
+                !email.Contains(".") ||
+                email.StartsWith("@") ||
+                email.EndsWith("@") ||
+                email.StartsWith(".") ||
+                email.EndsWith("."))
             {
                 MessageBox.Show(
                     "Informe um e-mail válido.",
@@ -204,8 +258,11 @@ namespace WpfApp1
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
+                txtEmail.Focus();
                 return;
             }
+
+            // VALIDAÇÃO DO TIPO
 
             if (string.IsNullOrWhiteSpace(tipo))
             {
@@ -218,6 +275,8 @@ namespace WpfApp1
                 return;
             }
 
+            // VALIDAÇÃO DO STATUS
+
             if (string.IsNullOrWhiteSpace(status))
             {
                 MessageBox.Show(
@@ -228,6 +287,8 @@ namespace WpfApp1
 
                 return;
             }
+
+            // VALIDAÇÃO DO AVATAR
 
             if (string.IsNullOrWhiteSpace(avatar))
             {
@@ -247,20 +308,104 @@ namespace WpfApp1
                 {
                     conexao.Open();
 
+                    // BUSCA OS VALORES ANTERIORES
+
+                    string nomeAnterior = "";
+                    string usuarioAnterior = "";
+                    string emailAnterior = "";
+                    string tipoAnterior = "";
+                    string statusAnterior = "";
+                    string avatarAnterior = "";
+
+                    string consultaAnterior = @"
+                        SELECT
+                            nome_completo,
+                            usuario,
+                            email,
+                            tipo_usuario,
+                            status,
+                            avatar
+                        FROM usuarios
+                        WHERE id = @id";
+
+                    using (MySqlCommand comandoAnterior =
+                        new MySqlCommand(
+                            consultaAnterior,
+                            conexao))
+                    {
+                        comandoAnterior.Parameters.AddWithValue(
+                            "@id",
+                            idUsuario);
+
+                        using (MySqlDataReader reader =
+                            comandoAnterior.ExecuteReader())
+                        {
+                            if (!reader.Read())
+                            {
+                                MessageBox.Show(
+                                    "Usuário não encontrado.",
+                                    "Atenção",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Warning);
+
+                                return;
+                            }
+
+                            nomeAnterior =
+                                reader["nome_completo"].ToString();
+
+                            usuarioAnterior =
+                                reader["usuario"].ToString();
+
+                            emailAnterior =
+                                reader["email"].ToString();
+
+                            tipoAnterior =
+                                reader["tipo_usuario"].ToString();
+
+                            statusAnterior =
+                                reader["status"].ToString();
+
+                            avatarAnterior =
+                                reader["avatar"].ToString();
+                        }
+                    }
+
+                    // PROTEÇÃO DO PRÓPRIO ADMINISTRADOR
+
+                    if (editandoPropriaConta &&
+                        Sessao.EhAdministrador)
+                    {
+                        tipo =
+                            tipoAnterior;
+
+                        status =
+                            statusAnterior;
+                    }
+
                     // VERIFICA USUÁRIO OU E-MAIL DUPLICADO
 
                     string verificar = @"
-                        SELECT COUNT(*)
+                        SELECT
+                            usuario,
+                            email
                         FROM usuarios
-                        WHERE (usuario = @usuario
-                        OR email = @email)
-                        AND id <> @id";
+                        WHERE id <> @id
+                        AND (
+                            usuario = @usuario
+                            OR email = @email
+                        )
+                        LIMIT 1";
 
                     using (MySqlCommand comandoVerificar =
                         new MySqlCommand(
                             verificar,
                             conexao))
                     {
+                        comandoVerificar.Parameters.AddWithValue(
+                            "@id",
+                            idUsuario);
+
                         comandoVerificar.Parameters.AddWithValue(
                             "@usuario",
                             usuario);
@@ -269,27 +414,148 @@ namespace WpfApp1
                             "@email",
                             email);
 
-                        comandoVerificar.Parameters.AddWithValue(
-                            "@id",
-                            idUsuario);
-
-                        int quantidade =
-                            Convert.ToInt32(
-                                comandoVerificar.ExecuteScalar());
-
-                        if (quantidade > 0)
+                        using (MySqlDataReader reader =
+                            comandoVerificar.ExecuteReader())
                         {
-                            MessageBox.Show(
-                                "O usuário ou e-mail já está cadastrado para outro usuário.",
-                                "Cadastro existente",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Warning);
+                            if (reader.Read())
+                            {
+                                string usuarioExistente =
+                                    reader["usuario"].ToString();
 
-                            return;
+                                string emailExistente =
+                                    reader["email"].ToString();
+
+                                if (usuarioExistente == usuario)
+                                {
+                                    reader.Close();
+
+                                    MessageBox.Show(
+                                        "Este nome de usuário já está cadastrado.",
+                                        "Usuário existente",
+                                        MessageBoxButton.OK,
+                                        MessageBoxImage.Warning);
+
+                                    txtUsuario.Focus();
+                                    return;
+                                }
+
+                                if (emailExistente == email)
+                                {
+                                    reader.Close();
+
+                                    MessageBox.Show(
+                                        "Este e-mail já está cadastrado.",
+                                        "E-mail existente",
+                                        MessageBoxButton.OK,
+                                        MessageBoxImage.Warning);
+
+                                    txtEmail.Focus();
+                                    return;
+                                }
+                            }
                         }
                     }
 
-                    // ALTERA USUÁRIO
+                    // IDENTIFICA SOMENTE O QUE FOI ALTERADO
+
+                    string valorAnterior = "";
+                    string novoValor = "";
+
+                    // NOME
+                    if (nomeAnterior != nome)
+                    {
+                        valorAnterior +=
+                            "Nome: " +
+                            nomeAnterior +
+                            "\n";
+
+                        novoValor +=
+                            "Nome: " +
+                            nome +
+                            "\n";
+                    }
+
+                    // USUÁRIO
+                    if (usuarioAnterior != usuario)
+                    {
+                        valorAnterior +=
+                            "Usuário: " +
+                            usuarioAnterior +
+                            "\n";
+
+                        novoValor +=
+                            "Usuário: " +
+                            usuario +
+                            "\n";
+                    }
+
+                    // E-MAIL
+                    if (emailAnterior != email)
+                    {
+                        valorAnterior +=
+                            "E-mail: " +
+                            emailAnterior +
+                            "\n";
+
+                        novoValor +=
+                            "E-mail: " +
+                            email +
+                            "\n";
+                    }
+
+                    // TIPO
+                    if (tipoAnterior != tipo)
+                    {
+                        valorAnterior +=
+                            "Tipo: " +
+                            tipoAnterior +
+                            "\n";
+
+                        novoValor +=
+                            "Tipo: " +
+                            tipo +
+                            "\n";
+                    }
+
+                    // STATUS
+                    if (statusAnterior != status)
+                    {
+                        valorAnterior +=
+                            "Status: " +
+                            statusAnterior +
+                            "\n";
+
+                        novoValor +=
+                            "Status: " +
+                            status +
+                            "\n";
+                    }
+
+                    // AVATAR
+                    if (avatarAnterior != avatar)
+                    {
+                        valorAnterior +=
+                            "Avatar: " +
+                            avatarAnterior +
+                            "\n";
+
+                        novoValor +=
+                            "Avatar: " +
+                            avatar +
+                            "\n";
+                    }
+
+                    valorAnterior =
+                        valorAnterior.TrimEnd(
+                            '\r',
+                            '\n');
+
+                    novoValor =
+                        novoValor.TrimEnd(
+                            '\r',
+                            '\n');
+
+                    // ATUALIZA USUÁRIO
 
                     string query = @"
                         UPDATE usuarios
@@ -339,45 +605,72 @@ namespace WpfApp1
                         comando.ExecuteNonQuery();
                     }
 
-                    // AUDITORIA
+                    // ATUALIZA SESSÃO
 
-                    string auditoria = @"
-                        INSERT INTO auditoria
-                        (
-                            usuario_responsavel,
-                            operacao,
-                            registro_afetado,
-                            valor_anterior,
-                            novo_valor
-                        )
-                        VALUES
-                        (
-                            @responsavel,
-                            'ALTERACAO',
-                            @afetado,
-                            NULL,
-                            @novo
-                        )";
-
-                    using (MySqlCommand comando =
-                        new MySqlCommand(
-                            auditoria,
-                            conexao))
+                    if (editandoPropriaConta)
                     {
-                        comando.Parameters.AddWithValue(
-                            "@responsavel",
-                            Sessao.Usuario);
+                        Sessao.NomeCompleto =
+                            nome;
 
-                        comando.Parameters.AddWithValue(
-                            "@afetado",
-                            usuario);
+                        Sessao.Email =
+                            email;
 
-                        comando.Parameters.AddWithValue(
-                            "@novo",
-                            "Tipo: " + tipo +
-                            " | Status: " + status);
+                        Sessao.Avatar =
+                            avatar;
 
-                        comando.ExecuteNonQuery();
+                        Sessao.Status =
+                            status;
+
+                        Sessao.TipoUsuario =
+                            tipo;
+                    }
+
+                    // AUDITORIA
+                    // SÓ GRAVA SE ALGUM CAMPO MUDOU
+
+                    if (!string.IsNullOrWhiteSpace(valorAnterior))
+                    {
+                        string auditoria = @"
+                            INSERT INTO auditoria
+                            (
+                                usuario_responsavel,
+                                operacao,
+                                registro_afetado,
+                                valor_anterior,
+                                novo_valor
+                            )
+                            VALUES
+                            (
+                                @responsavel,
+                                'ALTERACAO',
+                                @afetado,
+                                @anterior,
+                                @novo
+                            )";
+
+                        using (MySqlCommand comando =
+                            new MySqlCommand(
+                                auditoria,
+                                conexao))
+                        {
+                            comando.Parameters.AddWithValue(
+                                "@responsavel",
+                                Sessao.Usuario);
+
+                            comando.Parameters.AddWithValue(
+                                "@afetado",
+                                usuario);
+
+                            comando.Parameters.AddWithValue(
+                                "@anterior",
+                                valorAnterior);
+
+                            comando.Parameters.AddWithValue(
+                                "@novo",
+                                novoValor);
+
+                            comando.ExecuteNonQuery();
+                        }
                     }
                 }
 
@@ -387,8 +680,8 @@ namespace WpfApp1
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
 
-                TelaUsuarios tela =
-                    new TelaUsuarios();
+                TelaPrincipal tela =
+                    new TelaPrincipal();
 
                 tela.Show();
 
@@ -414,12 +707,24 @@ namespace WpfApp1
             }
         }
 
+        private void AlterarSenha_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            RedefinirSenha tela =
+                new RedefinirSenha(idUsuario);
+
+            tela.Show();
+
+            Close();
+        }
+
         private void Cancelar_Click(
             object sender,
             RoutedEventArgs e)
         {
-            TelaUsuarios tela =
-                new TelaUsuarios();
+            TelaPrincipal tela =
+                new TelaPrincipal();
 
             tela.Show();
 

@@ -31,6 +31,10 @@
 
             <Grid>
 
+                <!-- ================================================= -->
+                <!-- TÍTULO -->
+                <!-- ================================================= -->
+
                 <TextBlock Text="NOVO USUÁRIO"
                            FontSize="13"
                            FontWeight="Bold"
@@ -43,7 +47,11 @@
                            Foreground="#263238"
                            Margin="35,48,685,496"/>
 
+                <!-- ================================================= -->
                 <!-- COLUNA ESQUERDA -->
+                <!-- ================================================= -->
+
+                <!-- NOME -->
 
                 <TextBlock Text="Nome completo"
                            Margin="35,105,725,459"/>
@@ -55,6 +63,8 @@
                          HorizontalAlignment="Left"
                          Padding="10"/>
 
+                <!-- USUÁRIO -->
+
                 <TextBlock Text="Usuário"
                            Margin="35,180,770,378"/>
 
@@ -64,6 +74,8 @@
                          Margin="35,202,0,340"
                          HorizontalAlignment="Left"
                          Padding="10"/>
+
+                <!-- E-MAIL -->
 
                 <TextBlock Text="E-mail"
                            Margin="35,255,770,304"/>
@@ -75,6 +87,8 @@
                          HorizontalAlignment="Left"
                          Padding="10"/>
 
+                <!-- SENHA -->
+
                 <TextBlock Text="Senha"
                            Margin="35,327,755,234"/>
 
@@ -85,6 +99,8 @@
                              HorizontalAlignment="Left"
                              Padding="10,10"/>
 
+                <!-- CONFIRMAR SENHA -->
+
                 <TextBlock Text="Confirmar senha"
                            Margin="35,417,725,138"/>
 
@@ -93,9 +109,13 @@
                              Height="38"
                              Margin="35,442,0,100"
                              HorizontalAlignment="Left"
-                             Padding="10" RenderTransformOrigin="0.489,-0.439"/>
+                             Padding="10"/>
 
+                <!-- ================================================= -->
                 <!-- COLUNA DIREITA -->
+                <!-- ================================================= -->
+
+                <!-- TIPO -->
 
                 <TextBlock Text="Tipo de usuário"
                            Margin="430,105,326,459"/>
@@ -107,9 +127,12 @@
                           HorizontalAlignment="Left">
 
                     <ComboBoxItem Content="Usuario"/>
+
                     <ComboBoxItem Content="Administrador"/>
 
                 </ComboBox>
+
+                <!-- STATUS -->
 
                 <TextBlock Text="Status"
                            Margin="430,180,373,378"/>
@@ -121,9 +144,14 @@
                           HorizontalAlignment="Left">
 
                     <ComboBoxItem Content="Ativo"/>
+
                     <ComboBoxItem Content="Inativo"/>
 
                 </ComboBox>
+
+                <!-- ================================================= -->
+                <!-- AVATAR -->
+                <!-- ================================================= -->
 
                 <TextBlock Text="Avatar"
                            Margin="430,255,343,304"/>
@@ -134,15 +162,101 @@
                           Margin="430,281,0,261"
                           HorizontalAlignment="Left">
 
-                    <ComboBoxItem Content="avatar01.png"/>
-                    <ComboBoxItem Content="avatar02.png"/>
-                    <ComboBoxItem Content="avatar03.png"/>
-                    <ComboBoxItem Content="avatar04.png"/>
-                    <ComboBoxItem Content="avatar05.png"/>
+                    <!-- AVATAR 01 -->
+
+                    <ComboBoxItem Tag="avatar01.png">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <Image Source="https://cdn-icons-png.flaticon.com/128/80/80886.png"
+                                   Width="30"
+                                   Height="30"
+                                   Margin="0,0,10,0"/>
+
+                            <TextBlock Text="Avatar 01"
+                                       VerticalAlignment="Center"/>
+
+                        </StackPanel>
+
+                    </ComboBoxItem>
+
+                    <!-- AVATAR 02 -->
+
+                    <ComboBoxItem Tag="avatar02.png">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <Image Source="https://cdn-icons-png.flaticon.com/128/25/25437.png"
+                                   Width="30"
+                                   Height="30"
+                                   Margin="0,0,10,0"/>
+
+                            <TextBlock Text="Avatar 02"
+                                       VerticalAlignment="Center"/>
+
+                        </StackPanel>
+
+                    </ComboBoxItem>
+
+                    <!-- AVATAR 03 -->
+
+                    <ComboBoxItem Tag="avatar03.png">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <Image Source="https://cdn-icons-png.flaticon.com/128/3891/3891173.png"
+                                   Width="30"
+                                   Height="30"
+                                   Margin="0,0,10,0"/>
+
+                            <TextBlock Text="Avatar 03"
+                                       VerticalAlignment="Center"/>
+
+                        </StackPanel>
+
+                    </ComboBoxItem>
+
+                    <!-- AVATAR 04 -->
+
+                    <ComboBoxItem Tag="avatar04.png">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <Image Source="https://cdn-icons-png.flaticon.com/128/4886/4886363.png"
+                                   Width="30"
+                                   Height="30"
+                                   Margin="0,0,10,0"/>
+
+                            <TextBlock Text="Avatar 04"
+                                       VerticalAlignment="Center"/>
+
+                        </StackPanel>
+
+                    </ComboBoxItem>
+
+                    <!-- AVATAR 05 -->
+
+                    <ComboBoxItem Tag="avatar05.png">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <Image Source="https://cdn-icons-png.flaticon.com/128/3991/3991239.png"
+                                   Width="30"
+                                   Height="30"
+                                   Margin="0,0,10,0"/>
+
+                            <TextBlock Text="Avatar 05"
+                                       VerticalAlignment="Center"/>
+
+                        </StackPanel>
+
+                    </ComboBoxItem>
 
                 </ComboBox>
 
+                <!-- ================================================= -->
                 <!-- BOTÕES -->
+                <!-- ================================================= -->
 
                 <Button Content="Cadastrar"
                         Width="180"
